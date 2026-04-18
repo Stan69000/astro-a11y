@@ -21,16 +21,17 @@ pnpm example:scan
 ## CLI
 
 ```bash
-astro-a11y check <target> [--mode strict|balanced|learning] [--format terminal|json|html|markdown]
-astro-a11y report --input ./reports/report.json [--format terminal|json|html|markdown]
+astro-a11y check <target> [--mode strict|balanced|learning|paranoid] [--format terminal|json|html|markdown]
+astro-a11y report --input ./reports/report.json [--format terminal|json|html|markdown] [--safe-report]
 ```
 
 Exemples :
 
 ```bash
 astro-a11y check ./dist --mode balanced
+astro-a11y check https://example.com --mode paranoid --allowed-domains example.com
 astro-a11y check https://example.com --format json --output reports/report.json
-astro-a11y report --input reports/report.json --format html --output reports/report.html
+astro-a11y report --input reports/report.json --format html --output reports/report.html --safe-report
 ```
 
 ## Intégration Astro
@@ -75,4 +76,5 @@ Le projet est maintenu par une seule personne, et les contributions sont bienven
 - Local-first par défaut
 - Pas de télémétrie
 - Cibles distantes sensibles bloquées sauf autorisation explicite
+- Mode paranoid pour scans distants stricts
 - Workflow d’audit sécurité dédié

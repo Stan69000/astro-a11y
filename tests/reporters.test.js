@@ -4,6 +4,7 @@ import { renderTerminal } from "../packages/reporters/src/terminal.js";
 import { renderJson } from "../packages/reporters/src/json.js";
 import { renderHtml } from "../packages/reporters/src/html.js";
 import { renderMarkdown } from "../packages/reporters/src/markdown.js";
+import { renderByFormat } from "../packages/reporters/src/render-utils.js";
 
 const mockResult = {
   target: "/dist",
@@ -75,4 +76,37 @@ test("renderMarkdown handles empty issues", () => {
   const result = { ...mockResult, issues: [] };
   const output = renderMarkdown(result);
   assert.match(output, /No accessibility issues detected/);
+});
+
+test("renderByFormat truncates oversized fields", () => {
+  const veryLongTitle = "x".repeat(6000);
+  const output = renderByFormat(
+    {
+      ...mockResult,
+      issues: [{ ...mockResult.issues[0], title: veryLongTitle }]
+    },
+    "json",
+    { maxFieldLength: 200 }
+  );
+  assert.match(output, /\.\.\.\[truncated\]/);
+});
+
+test("renderByFormat strips raw html in safe-report mode", () => {
+  const output = renderByFormat(
+    {
+      ...mockResult,
+      issues: [
+        {
+          ...mockResult.issues[0],
+          before: "<img src=x>",
+          nodes: [{ target: "img", html: "<img src=x>" }]
+        }
+      ]
+    },
+    "json",
+    { safeReport: true }
+  );
+  const parsed = JSON.parse(output);
+  assert.equal(parsed.issues[0].before, undefined);
+  assert.equal(parsed.issues[0].nodes[0].html, undefined);
 });
