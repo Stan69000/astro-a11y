@@ -1,0 +1,5 @@
+{
+  "name": "static-site-example",
+  "private": true,
+  "type": "module"
+}

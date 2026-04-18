@@ -1,0 +1,13 @@
+{
+  "name": "@astro-a11y/reporters",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "node ../../scripts/copy-package.js packages/reporters/src packages/reporters/dist"
+  }
+}

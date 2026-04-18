@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -r \"TODO\\\\|FIXME\\\\|HACK\\\\|XXX\" /Users/stanbouchet/astro-a11y --include=\"*.js\" --include=\"*.json\" ! -path \"*/node_modules/*\" ! -path \"*/dist/*\")",
+      "Bash(find /Users/stanbouchet/astro-a11y -name \"*.test.js\" -exec wc -l {} +)",
+      "Bash(grep -E \"\\\\.\\(js|ts|json|yml|yaml|md\\)$\")",
+      "Bash(npm ls *)"
+    ]
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "name": "astro-a11y",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": {
+    "astro-a11y": "./dist/bin.js"
+  },
+  "main": "./dist/bin.js",
+  "files": ["dist"],
+  "scripts": {
+    "build": "node ../../scripts/copy-package.js packages/cli/src packages/cli/dist"
+  },
+  "dependencies": {
+    "@astro-a11y/core": "workspace:*",
+    "@astro-a11y/reporters": "workspace:*",
+    "commander": "^13.0.0"
+  }
+}

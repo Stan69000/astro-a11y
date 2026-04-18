@@ -1,0 +1,20 @@
+{
+  "name": "@astro-a11y/astro-integration",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "node ../../scripts/copy-package.js packages/astro-integration/src packages/astro-integration/dist"
+  },
+  "dependencies": {
+    "@astro-a11y/core": "workspace:*",
+    "@astro-a11y/reporters": "workspace:*"
+  },
+  "peerDependencies": {
+    "astro": ">=5"
+  }
+}
