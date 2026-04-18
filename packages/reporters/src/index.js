@@ -1,1 +1,1 @@
-export { renderByFormat, renderTerminal, renderJson, renderHtml, renderMarkdown } from "./render-utils.js";
+export { renderByFormat, renderTerminal, renderJson, renderHtml, renderMarkdown, sanitizeResult } from "./render-utils.js";
