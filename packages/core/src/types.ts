@@ -50,6 +50,10 @@ export interface ScanSummary {
 export interface ScanOptions {
   mode?: string;
   allowUnsafeTargets?: boolean;
+  allowedDomains?: string[];
+  maxRedirects?: number;
+  blockSensitivePorts?: boolean;
+  enforceSandbox?: boolean;
   includeTags?: string[];
   excludeRules?: string[];
   timeout?: number;
