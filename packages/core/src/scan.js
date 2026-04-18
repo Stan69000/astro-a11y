@@ -8,6 +8,7 @@ import { startStaticServer } from './static-server.js';
 import { enrichViolation } from './mappings.js';
 
 const DEFAULT_TIMEOUT_MS = 15000;
+const isCI = process.env.CI === 'true';
 
 function isUrl(target) {
   return /^https?:\/\//i.test(target);
@@ -64,7 +65,7 @@ export async function scanRemoteUrl(url, options = {}) {
 
   const browser = await chromium.launch({
     headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox']
+    args: isCI ? ['--no-sandbox', '--disable-setuid-sandbox'] : []
   });
   try {
     const context = await browser.newContext();
@@ -101,7 +102,7 @@ export async function scanDirectory(rootDir, options = {}) {
   const server = await startStaticServer(rootDir);
   const browser = await chromium.launch({
     headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox']
+    args: isCI ? ['--no-sandbox', '--disable-setuid-sandbox'] : []
   });
 
   try {
