@@ -18,7 +18,7 @@ export async function startStaticServer(rootDir) {
     try {
       const requestUrl = new URL(req.url ?? "/", "http://127.0.0.1");
       const decodedPathname = decodeURIComponent(requestUrl.pathname);
-      let filePath = path.join(rootDir, decodedPathname);
+      const filePath = path.join(rootDir, decodedPathname);
 
       const resolvedRoot = path.resolve(rootDir);
       const resolvedPath = path.resolve(filePath);

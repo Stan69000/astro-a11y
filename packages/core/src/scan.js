@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { chromium } from 'playwright';
 import AxeBuilder from '@axe-core/playwright';
-import { assertAllowedRemoteTarget, isUnsafeHostname } from './security.js';
+import { assertAllowedRemoteTarget } from './security.js';
 import { collectHtmlRoutesFromDirectory } from './routes.js';
 import { startStaticServer } from './static-server.js';
 import { enrichViolation } from './mappings.js';
