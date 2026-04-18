@@ -13,6 +13,6 @@
   "dependencies": {
     "@astro-a11y/core": "workspace:*",
     "@astro-a11y/reporters": "workspace:*",
-    "commander": "^13.0.0"
+    "commander": "^14.0.3"
   }
 }
