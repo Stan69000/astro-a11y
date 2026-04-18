@@ -8,7 +8,7 @@
   },
   "files": ["dist"],
   "scripts": {
-    "build": "node ../../scripts/copy-package.js packages/astro-integration/src packages/astro-integration/dist"
+    "build": "node ../../scripts/copy-package.js src dist"
   },
   "dependencies": {
     "@astro-a11y/core": "workspace:*",

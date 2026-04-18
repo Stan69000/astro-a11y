@@ -10,7 +10,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "node ../../scripts/copy-package.js packages/core/src packages/core/dist"
+    "build": "node ../../scripts/copy-package.js src dist"
   },
   "dependencies": {
     "@axe-core/playwright": "^4.10.2",

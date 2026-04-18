@@ -8,6 +8,6 @@
   },
   "files": ["dist"],
   "scripts": {
-    "build": "node ../../scripts/copy-package.js packages/reporters/src packages/reporters/dist"
+    "build": "node ../../scripts/copy-package.js src dist"
   }
 }
