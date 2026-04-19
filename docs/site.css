@@ -43,8 +43,7 @@ body {
 
 .hero__bg {
   position: absolute;
-  inset: -20% -10% auto;
-  height: 520px;
+  inset: -20% -10% -20%;
   background:
     radial-gradient(circle at 22% 30%, rgba(13, 122, 98, 0.22), transparent 42%),
     radial-gradient(circle at 80% 12%, rgba(215, 126, 42, 0.2), transparent 30%),
