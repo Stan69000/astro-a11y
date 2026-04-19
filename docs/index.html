@@ -6,11 +6,47 @@
     <title>Astro a11y | Accessibilité Astro, concrète et fiable</title>
     <meta
       name="description"
-      content="astro-a11y aide les équipes Astro à détecter des problèmes d'accessibilité, produire des rapports clairs et sécuriser les scans locaux ou distants."
+      content="Astro a11y est un toolkit open source pour renforcer l'accessibilité des sites Astro: scan Playwright + axe, recommandations actionnables, rapports HTML/JSON/Markdown."
     />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta name="author" content="Stan Bouchet" />
+    <link rel="canonical" href="https://stan69000.github.io/astro-a11y/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="fr_FR" />
+    <meta property="og:site_name" content="Astro a11y" />
+    <meta property="og:title" content="Astro a11y | Accessibilité Astro, concrète et fiable" />
+    <meta
+      property="og:description"
+      content="Scannez vos pages Astro avec Playwright + axe, obtenez des recommandations actionnables et des rapports partageables."
+    />
+    <meta property="og:url" content="https://stan69000.github.io/astro-a11y/" />
+    <meta property="og:image" content="https://stan69000.github.io/astro-a11y/examples/example-report.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Astro a11y | Accessibilité Astro, concrète et fiable" />
+    <meta
+      name="twitter:description"
+      content="Toolkit open source Astro-first pour intégrer l'accessibilité dans le build et la CI."
+    />
+    <meta name="twitter:image" content="https://stan69000.github.io/astro-a11y/examples/example-report.png" />
+    <meta name="theme-color" content="#eef5f1" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0f1715" media="(prefers-color-scheme: dark)" />
     <link rel="stylesheet" href="./site.css" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "Astro a11y",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Cross-platform",
+        "url": "https://stan69000.github.io/astro-a11y/",
+        "codeRepository": "https://github.com/Stan69000/astro-a11y",
+        "license": "https://github.com/Stan69000/astro-a11y/blob/main/LICENSE",
+        "description": "Toolkit Astro-first pour scanner l'accessibilité web avec Playwright + axe et produire des rapports actionnables."
+      }
+    </script>
   </head>
   <body>
+    <a class="skip-link" href="#main-content">Aller au contenu principal</a>
     <header class="hero" id="top">
       <div class="hero__bg"></div>
       <nav class="nav wrap" aria-label="Navigation principale">
@@ -22,13 +58,17 @@
           <li><a href="#preuve">Preuves</a></li>
           <li><a href="#demarrage">Démarrage</a></li>
         </ul>
+        <button class="theme-toggle" type="button" aria-label="Changer le thème" data-theme-toggle>
+          <span aria-hidden="true">◐</span>
+          <span>Thème</span>
+        </button>
       </nav>
 
       <section class="wrap hero__content">
         <p class="eyebrow">Boîte à outils open source pour Astro</p>
         <h1>L'accessibilité web devient un réflexe dans votre cycle de build</h1>
         <p class="lead">
-          <strong>astro-a11y</strong> scanne vos pages rendues avec Playwright + axe,
+          <strong>Astro a11y</strong> scanne vos pages rendues avec Playwright + axe,
           enrichit les résultats avec des recommandations actionnables et relie les
           problèmes courants au RGAA.
         </p>
@@ -44,7 +84,7 @@
       </section>
     </header>
 
-    <main>
+    <main id="main-content">
       <section class="section wrap" id="public">
         <div class="section__head">
           <p class="eyebrow">Pour le grand public et les décideurs</p>
@@ -52,7 +92,7 @@
         </div>
         <div class="grid grid--2">
           <article class="card">
-            <h3>Ce que fait astro-a11y</h3>
+            <h3>Ce que fait Astro a11y</h3>
             <p>
               L'outil détecte automatiquement des défauts d'accessibilité techniques
               sur les pages déjà rendues, puis propose des pistes de correction.
@@ -107,7 +147,7 @@
         </p>
         <div class="grid grid--2">
           <article class="card">
-            <h3>astro-a11y (ce projet)</h3>
+            <h3>Astro a11y (ce projet)</h3>
             <p>
               Un <strong>guardrail Astro-first</strong>: il s'intègre au build Astro
               (ou via CLI) pour industrialiser un contrôle régulier et produire des rapports
@@ -132,7 +172,7 @@
         </div>
         <p class="section__text">
           En pratique: si ton équipe construit en Astro et veut un contrôle continu au moment du build,
-          <strong>astro-a11y</strong> est la bonne couche. Pour une lecture RGAA plus transversale et pédagogique,
+          <strong>Astro a11y</strong> est la bonne couche. Pour une lecture RGAA plus transversale et pédagogique,
           <strong>rgaa-audit</strong> reste très utile.
         </p>
         <p class="section__text">
@@ -144,7 +184,7 @@
           <ul>
             <li>
               <strong>Cas 1:</strong> projet Astro avec besoin de contrôle régulier en build/CI
-              → <strong>astro-a11y</strong>.
+              → <strong>Astro a11y</strong>.
             </li>
             <li>
               <strong>Cas 2:</strong> besoin d'une lecture pédagogique RGAA, plus généraliste
@@ -152,7 +192,7 @@
             </li>
             <li>
               <strong>Cas 3:</strong> équipe mixte (tech + non-tech)
-              → utiliser <strong>les deux</strong>: rgaa-audit pour cadrer, astro-a11y pour industrialiser.
+              → utiliser <strong>les deux</strong>: rgaa-audit pour cadrer, Astro a11y pour industrialiser.
             </li>
           </ul>
         </div>
@@ -208,5 +248,21 @@ export default defineConfig({
         <a href="https://github.com/stanbouchet/astro-a11y/blob/main/README.fr.md">Documentation FR</a>
       </p>
     </footer>
+    <script>
+      (function () {
+        var key = 'astro-a11y-theme';
+        var root = document.documentElement;
+        var saved = localStorage.getItem(key);
+        if (saved === 'light' || saved === 'dark') root.setAttribute('data-theme', saved);
+        var button = document.querySelector('[data-theme-toggle]');
+        if (!button) return;
+        button.addEventListener('click', function () {
+          var current = root.getAttribute('data-theme');
+          var next = current === 'dark' ? 'light' : 'dark';
+          root.setAttribute('data-theme', next);
+          localStorage.setItem(key, next);
+        });
+      })();
+    </script>
   </body>
 </html>
