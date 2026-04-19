@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="560" viewBox="0 0 1280 560" role="img" aria-labelledby="title desc">
+  <title id="title">Deux niveaux de lecture</title>
+  <desc id="desc">Illustration séparant une vue accessible au grand public et une vue technique pour développeurs.</desc>
+  <defs>
+    <style>
+      .title { font: 700 36px 'Space Grotesk', Arial, sans-serif; fill: #11231e; }
+      .sub { font: 500 22px 'Space Grotesk', Arial, sans-serif; fill: #335047; }
+      .small { font: 600 18px 'Space Grotesk', Arial, sans-serif; fill: #0c624f; }
+    </style>
+  </defs>
+  <rect width="1280" height="560" fill="#f2f7f4"/>
+  <circle cx="180" cy="120" r="160" fill="#0d7a62" opacity="0.15"/>
+  <circle cx="1130" cy="430" r="180" fill="#d77e2a" opacity="0.15"/>
+
+  <rect x="80" y="90" width="500" height="380" rx="30" fill="#ffffff" stroke="#c9dcd4" stroke-width="2"/>
+  <text class="title" x="120" y="155">Lecture simplifiée</text>
+  <text class="sub" x="120" y="205">Pour produit, marketing, direction</text>
+  <text class="small" x="120" y="255">• Problèmes expliqués simplement</text>
+  <text class="small" x="120" y="290">• Priorités d'action compréhensibles</text>
+  <text class="small" x="120" y="325">• Rapports HTML partageables</text>
+
+  <rect x="700" y="90" width="500" height="380" rx="30" fill="#ffffff" stroke="#c9dcd4" stroke-width="2"/>
+  <text class="title" x="740" y="155">Lecture technique</text>
+  <text class="sub" x="740" y="205">Pour dev front, QA, CI</text>
+  <text class="small" x="740" y="255">• Détails des violations axe</text>
+  <text class="small" x="740" y="290">• Mapping RGAA sur cas courants</text>
+  <text class="small" x="740" y="325">• Formats JSON et Markdown</text>
+
+  <path d="M 588 280 L 690 280" stroke="#0d7a62" stroke-width="8" stroke-linecap="round"/>
+  <polygon points="690,280 662,264 662,296" fill="#0d7a62"/>
+</svg>
