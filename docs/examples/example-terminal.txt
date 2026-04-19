@@ -1,0 +1,55 @@
+astro-a11y report
+Target: /Users/stanbouchet/astro-a11y/examples/static-site/dist
+Mode: learning
+Generated: 2026-04-19T12:02:07.003Z
+Pages scanned: 2
+Issues: critical=2, major=5, minor=0, info=0
+
+[MAJOR] Document has no title — RGAA 8.5
+Page: http://127.0.0.1:56619/contact/
+Rule: document-title
+Fix: Ensure each page has a descriptive title element.
+Target: html
+Summary: Fix any of the following:   Document does not have a non-empty <title> element
+
+[MAJOR] HTML element has no lang attribute — RGAA 8.3
+Page: http://127.0.0.1:56619/contact/
+Rule: html-has-lang
+Fix: Set the lang attribute on the root html element.
+Target: html
+Summary: Fix any of the following:   The <html> element does not have a lang attribute
+
+[CRITICAL] Form control is missing a label — RGAA 11.1
+Page: http://127.0.0.1:56619/contact/
+Rule: label
+Fix: Associate a visible or programmatic label with each form control.
+Target: #email
+Summary: Fix any of the following:   Element does not have an implicit (wrapped) <label>   Element does not have an explicit <label>   aria-label attribute does not exist or is empty   aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty   Element has no title attribute   Element has no placeholder attribute   Element's default semantics were not overridden with role="none" or role="presentation"
+
+[CRITICAL] Button has no accessible name — RGAA 11.9
+Page: http://127.0.0.1:56619/
+Rule: button-name
+Fix: Add visible text, aria-label, or an accessible name linked to the button.
+Target: button
+Summary: Fix any of the following:   Element does not have inner text that is visible to screen readers   aria-label attribute does not exist or is empty   aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty   Element has no title attribute   Element does not have an implicit (wrapped) <label>   Element does not have an explicit <label>   Element's default semantics were not overridden with role="none" or role="presentation"
+
+[MAJOR] Insufficient color contrast — RGAA 3.2
+Page: http://127.0.0.1:56619/
+Rule: color-contrast
+Fix: Increase the contrast ratio between foreground and background colors.
+Target: .muted
+Summary: Fix any of the following:   Element has insufficient color contrast of 1.24 (foreground color: #888888, background color: #999999, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1
+
+[MAJOR] Iframe has no title — RGAA 2.1
+Page: http://127.0.0.1:56619/
+Rule: frame-title
+Fix: Add a concise and meaningful title attribute to the iframe.
+Target: iframe
+Summary: Fix any of the following:   Element has no title attribute   aria-label attribute does not exist or is empty   aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty   Element's default semantics were not overridden with role="none" or role="presentation"
+
+[MAJOR] Alternative text missing on image — RGAA 1.1
+Page: http://127.0.0.1:56619/
+Rule: image-alt
+Fix: Add a meaningful alt attribute, or alt="" for decorative images.
+Target: img
+Summary: Fix any of the following:   Element does not have an alt attribute   aria-label attribute does not exist or is empty   aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty   Element has no title attribute   Element's default semantics were not overridden with role="none" or role="presentation"
