@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="520" viewBox="0 0 1280 520" role="img" aria-labelledby="title desc">
+  <title id="title">Workflow astro-a11y</title>
+  <desc id="desc">Pipeline illustrant la cible, les garde-fous de sécurité, l'analyse Playwright plus axe, puis les rapports.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#eef5f1"/>
+      <stop offset="1" stop-color="#f7f9f8"/>
+    </linearGradient>
+    <style>
+      .card { fill: #ffffff; stroke: #c9dcd4; stroke-width: 2; }
+      .head { font: 700 30px 'Space Grotesk', Arial, sans-serif; fill: #132620; }
+      .txt { font: 500 20px 'Space Grotesk', Arial, sans-serif; fill: #35524a; }
+      .badge { font: 700 16px 'Space Grotesk', Arial, sans-serif; fill: #0a624f; }
+    </style>
+  </defs>
+  <rect width="1280" height="520" fill="url(#bg)"/>
+
+  <rect class="card" x="60" y="144" rx="22" width="246" height="210"/>
+  <text class="head" x="92" y="195">1. Cible</text>
+  <text class="txt" x="92" y="232">• ./dist</text>
+  <text class="txt" x="92" y="264">• https://site.tld</text>
+  <text class="badge" x="92" y="304">Local ou distant</text>
+
+  <rect class="card" x="362" y="144" rx="22" width="246" height="210"/>
+  <text class="head" x="394" y="195">2. Sécurité</text>
+  <text class="txt" x="394" y="232">Blocage localhost</text>
+  <text class="txt" x="394" y="264">IP privées, .local</text>
+  <text class="badge" x="394" y="304">Garde-fous SSRF</text>
+
+  <rect class="card" x="664" y="144" rx="22" width="246" height="210"/>
+  <text class="head" x="696" y="195">3. Scan</text>
+  <text class="txt" x="696" y="232">Playwright + axe</text>
+  <text class="txt" x="696" y="264">routes rendues</text>
+  <text class="badge" x="696" y="304">Violations détectées</text>
+
+  <rect class="card" x="966" y="144" rx="22" width="246" height="210"/>
+  <text class="head" x="998" y="195">4. Rapports</text>
+  <text class="txt" x="998" y="232">Terminal / JSON</text>
+  <text class="txt" x="998" y="264">HTML / Markdown</text>
+  <text class="badge" x="998" y="304">Lecture multi-public</text>
+
+  <path d="M 315 248 L 352 248" stroke="#0d7a62" stroke-width="5" stroke-linecap="round"/>
+  <polygon points="352,248 338,240 338,256" fill="#0d7a62"/>
+
+  <path d="M 617 248 L 654 248" stroke="#0d7a62" stroke-width="5" stroke-linecap="round"/>
+  <polygon points="654,248 640,240 640,256" fill="#0d7a62"/>
+
+  <path d="M 919 248 L 956 248" stroke="#0d7a62" stroke-width="5" stroke-linecap="round"/>
+  <polygon points="956,248 942,240 942,256" fill="#0d7a62"/>
+</svg>

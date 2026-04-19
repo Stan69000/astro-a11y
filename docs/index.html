@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>astro-a11y | Accessibilité Astro, concrète et fiable</title>
+    <meta
+      name="description"
+      content="astro-a11y aide les équipes Astro à détecter des problèmes d'accessibilité, produire des rapports clairs et sécuriser les scans locaux ou distants."
+    />
+    <link rel="stylesheet" href="./site.css" />
+  </head>
+  <body>
+    <header class="hero" id="top">
+      <div class="hero__bg"></div>
+      <nav class="nav wrap" aria-label="Navigation principale">
+        <a class="brand" href="#top">astro-a11y</a>
+        <ul>
+          <li><a href="#public">Grand public</a></li>
+          <li><a href="#dev">Développeurs</a></li>
+          <li><a href="#preuve">Preuves</a></li>
+          <li><a href="#demarrage">Démarrage</a></li>
+        </ul>
+      </nav>
+
+      <section class="wrap hero__content">
+        <p class="eyebrow">Boîte à outils open source pour Astro</p>
+        <h1>L'accessibilité web devient un réflexe dans votre cycle de build</h1>
+        <p class="lead">
+          <strong>astro-a11y</strong> scanne vos pages rendues avec Playwright + axe,
+          enrichit les résultats avec des recommandations actionnables et relie les
+          problèmes courants au RGAA.
+        </p>
+        <div class="cta">
+          <a class="btn btn--primary" href="https://github.com/stanbouchet/astro-a11y">Voir le dépôt GitHub</a>
+          <a class="btn btn--ghost" href="#demarrage">Installer en 2 minutes</a>
+        </div>
+        <ul class="trust-list" aria-label="Points clés">
+          <li>Local-first et sans télémétrie</li>
+          <li>Rapports pour experts et non-tech</li>
+          <li>Compatible CLI et intégration Astro</li>
+        </ul>
+      </section>
+    </header>
+
+    <main>
+      <section class="section wrap" id="public">
+        <div class="section__head">
+          <p class="eyebrow">Pour le grand public et les décideurs</p>
+          <h2>Comprendre rapidement ce que l'outil apporte</h2>
+        </div>
+        <div class="grid grid--2">
+          <article class="card">
+            <h3>Ce que fait astro-a11y</h3>
+            <p>
+              L'outil détecte automatiquement des défauts d'accessibilité techniques
+              sur les pages déjà rendues, puis propose des pistes de correction.
+            </p>
+          </article>
+          <article class="card">
+            <h3>Ce qu'il ne fait pas</h3>
+            <p>
+              Il ne remplace pas un audit humain complet ni les tests utilisateurs.
+              C'est un garde-fou opérationnel, pas une certification légale.
+            </p>
+          </article>
+        </div>
+        <figure class="figure">
+          <img src="./assets/illustration-audiences.svg" alt="Deux parcours: lecture simplifiée pour équipes produit et détails techniques pour développeurs" />
+        </figure>
+      </section>
+
+      <section class="section section--alt" id="dev">
+        <div class="wrap">
+          <div class="section__head">
+            <p class="eyebrow">Pour les développeurs</p>
+            <h2>Un workflow clair, du scan au rapport</h2>
+          </div>
+          <div class="grid grid--3">
+            <article class="card">
+              <h3>1. Scanner</h3>
+              <p>Une cible locale (<code>./dist</code>) ou distante (<code>https://...</code>) est analysée avec garde-fous sécurité.</p>
+            </article>
+            <article class="card">
+              <h3>2. Analyser</h3>
+              <p>Les pages sont ouvertes dans Playwright puis vérifiées via <code>@axe-core/playwright</code>.</p>
+            </article>
+            <article class="card">
+              <h3>3. Corriger</h3>
+              <p>Les violations sont enrichies avec recommandations et mapping RGAA pour prioriser les fixes.</p>
+            </article>
+          </div>
+          <figure class="figure">
+            <img src="./assets/illustration-workflow.svg" alt="Schéma du pipeline astro-a11y: cible, sécurité, scan navigateur, rapports" />
+          </figure>
+        </div>
+      </section>
+
+      <section class="section wrap" id="preuve">
+        <div class="section__head">
+          <p class="eyebrow">Preuve visuelle</p>
+          <h2>Exemple réel de rapport HTML généré</h2>
+        </div>
+        <p class="section__text">
+          Cette capture provient des artefacts versionnés du dépôt, générés par le scénario d'exemple.
+        </p>
+        <figure class="figure figure--screenshot">
+          <img src="./examples/example-report.png" alt="Capture d'écran d'un rapport HTML astro-a11y" />
+          <figcaption>
+            Voir aussi:
+            <a href="./examples/example-report.html">rapport HTML</a>,
+            <a href="./examples/example-report.json">JSON</a>,
+            <a href="./examples/example-report.md">Markdown</a>.
+          </figcaption>
+        </figure>
+      </section>
+
+      <section class="section section--alt" id="demarrage">
+        <div class="wrap">
+          <div class="section__head">
+            <p class="eyebrow">Démarrage</p>
+            <h2>Intégration Astro en quelques lignes</h2>
+          </div>
+          <div class="code-grid">
+            <pre><code>pnpm add -D @astro-a11y/astro-integration
+pnpm astro build</code></pre>
+            <pre><code>import { defineConfig } from 'astro/config';
+import astroA11y from '@astro-a11y/astro-integration';
+
+export default defineConfig({
+  integrations: [astroA11y({ mode: 'balanced' })]
+});</code></pre>
+          </div>
+          <p class="section__text">
+            Rapports par défaut dans <code>dist/astro-a11y/</code>. La CLI reste disponible pour scanner un dossier build ou une URL.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer wrap">
+      <p>
+        Projet open source maintenu sur GitHub.
+        <a href="https://github.com/stanbouchet/astro-a11y">Contribuer</a>
+        ·
+        <a href="https://github.com/stanbouchet/astro-a11y/blob/main/README.fr.md">Documentation FR</a>
+      </p>
+    </footer>
+  </body>
+</html>
