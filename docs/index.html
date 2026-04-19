@@ -18,6 +18,7 @@
         <ul>
           <li><a href="#public">Grand public</a></li>
           <li><a href="#dev">Développeurs</a></li>
+          <li><a href="#difference">Différence</a></li>
           <li><a href="#preuve">Preuves</a></li>
           <li><a href="#demarrage">Démarrage</a></li>
         </ul>
@@ -93,6 +94,67 @@
           <figure class="figure">
             <img src="./assets/illustration-workflow.svg" alt="Schéma du pipeline astro-a11y: cible, sécurité, scan navigateur, rapports" />
           </figure>
+        </div>
+      </section>
+
+      <section class="section wrap" id="difference">
+        <div class="section__head">
+          <p class="eyebrow">Positionnement</p>
+          <h2>Quelle différence avec rgaa-audit ?</h2>
+        </div>
+        <p class="section__text">
+          Les deux projets sont complémentaires, mais ils ne répondent pas au même besoin principal.
+        </p>
+        <div class="grid grid--2">
+          <article class="card">
+            <h3>astro-a11y (ce projet)</h3>
+            <p>
+              Un <strong>guardrail Astro-first</strong>: il s'intègre au build Astro
+              (ou via CLI) pour industrialiser un contrôle régulier et produire des rapports
+              exploitables par les équipes dev, QA et produit.
+            </p>
+            <p>
+              Points forts: intégration Astro, pipeline simple, formats Terminal/JSON/HTML/Markdown,
+              garde-fous de sécurité sur scans distants.
+            </p>
+          </article>
+          <article class="card">
+            <h3>rgaa-audit</h3>
+            <p>
+              Un <strong>pré-audit RGAA généraliste</strong>, orienté pédagogie et lecture
+              de conformité, avec une approche plus large hors contexte Astro.
+            </p>
+            <p>
+              Points forts: vulgarisation RGAA, couverture présentée par thèmes,
+              et usages orientés diagnostic initial.
+            </p>
+          </article>
+        </div>
+        <p class="section__text">
+          En pratique: si ton équipe construit en Astro et veut un contrôle continu au moment du build,
+          <strong>astro-a11y</strong> est la bonne couche. Pour une lecture RGAA plus transversale et pédagogique,
+          <strong>rgaa-audit</strong> reste très utile.
+        </p>
+        <p class="section__text">
+          Lien vers l'autre projet:
+          <a href="https://stan69000.github.io/rgaa-audit/">https://stan69000.github.io/rgaa-audit/</a>
+        </p>
+        <div class="card compare">
+          <h3>Quand choisir quoi ?</h3>
+          <ul>
+            <li>
+              <strong>Cas 1:</strong> projet Astro avec besoin de contrôle régulier en build/CI
+              → <strong>astro-a11y</strong>.
+            </li>
+            <li>
+              <strong>Cas 2:</strong> besoin d'une lecture pédagogique RGAA, plus généraliste
+              → <strong>rgaa-audit</strong>.
+            </li>
+            <li>
+              <strong>Cas 3:</strong> équipe mixte (tech + non-tech)
+              → utiliser <strong>les deux</strong>: rgaa-audit pour cadrer, astro-a11y pour industrialiser.
+            </li>
+          </ul>
         </div>
       </section>
 

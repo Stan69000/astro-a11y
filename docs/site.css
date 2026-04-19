@@ -209,6 +209,23 @@ h3 {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+#difference .card p {
+  margin: 0.65rem 0 0;
+}
+
+.compare {
+  margin-top: 1rem;
+}
+
+.compare ul {
+  margin: 0.8rem 0 0;
+  padding-left: 1.1rem;
+}
+
+.compare li + li {
+  margin-top: 0.55rem;
+}
+
 .grid--3 {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
