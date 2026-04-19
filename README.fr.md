@@ -43,6 +43,19 @@ pnpm test
 pnpm example:scan
 ```
 
+## Exemple de sortie
+
+Des artefacts d'exemple versionnés issus de `pnpm example:scan` sont disponibles ici :
+
+- [Sortie terminal](./docs/examples/example-terminal.txt)
+- [Rapport JSON](./docs/examples/example-report.json)
+- [Rapport Markdown](./docs/examples/example-report.md)
+- [Rapport HTML](./docs/examples/example-report.html)
+
+Capture du rapport HTML généré :
+
+![Exemple de rapport HTML astro-a11y](./docs/examples/example-report.png)
+
 ## Guide débutant
 
 ### Cas 1 - Monter un nouveau site Astro avec astro-a11y
