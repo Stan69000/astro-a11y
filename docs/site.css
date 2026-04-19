@@ -87,6 +87,7 @@ body {
 body {
   font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
   color: var(--ink);
+  --text-bg: var(--bg);
   background-color: var(--bg);
   background: linear-gradient(180deg, var(--hero-bg) 0%, var(--bg) 45%, var(--bg) 100%);
   line-height: 1.6;
@@ -101,6 +102,7 @@ body {
 .hero {
   position: relative;
   overflow: hidden;
+  --text-bg: var(--hero-bg);
   background-color: var(--hero-bg);
   border-bottom: 1px solid var(--line);
 }
@@ -294,6 +296,7 @@ h3 {
 }
 
 .section--alt {
+  --text-bg: var(--hero-bg);
   background-color: var(--hero-bg);
   background: var(--section-alt-grad);
   border-top: 1px solid var(--line);
@@ -340,11 +343,28 @@ h3 {
 }
 
 .card {
+  --text-bg: var(--surface);
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   padding: 1.25rem;
   box-shadow: var(--shadow);
+}
+
+.brand,
+.nav a,
+.theme-toggle,
+.theme-toggle span,
+.eyebrow,
+h1,
+h2,
+h3,
+p,
+li,
+figcaption,
+figcaption a,
+.footer a {
+  background-color: var(--text-bg);
 }
 
 .figure {
