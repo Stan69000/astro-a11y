@@ -13,7 +13,7 @@
     "build": "node ../../scripts/copy-package.js src dist"
   },
   "dependencies": {
-    "@axe-core/playwright": "^4.12.1",
+    "@axe-core/playwright": "^4.13.0",
     "playwright": "^1.62.1"
   }
 }
