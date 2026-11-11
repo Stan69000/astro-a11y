@@ -37,15 +37,20 @@ function getSecurityOptions(options = {}) {
   };
 }
 
-export function summarizeIssues(issues) {
+/**
+ * @param {Array<{ severity: string }>} issues
+ * @param {number} pagesScanned Number of pages actually analysed, including pages without issues.
+ */
+export function summarizeIssues(issues, pagesScanned) {
+  if (!Number.isInteger(pagesScanned) || pagesScanned < 0) {
+    throw new TypeError(`pagesScanned must be a non-negative integer, got: ${pagesScanned}`);
+  }
   const issuesBySeverity = { critical: 0, major: 0, minor: 0, info: 0 };
-  const pages = new Set();
   for (const issue of issues) {
     issuesBySeverity[issue.severity] += 1;
-    pages.add(issue.page);
   }
   return {
-    pagesScanned: pages.size,
+    pagesScanned,
     issuesBySeverity,
     failed: issuesBySeverity.critical > 0 || issuesBySeverity.major > 0
   };
@@ -103,7 +108,7 @@ export async function scanRemoteUrl(url, options = {}) {
       mode: options.mode ?? 'balanced',
       generatedAt: new Date().toISOString(),
       issues,
-      summary: summarizeIssues(issues)
+      summary: summarizeIssues(issues, 1)
     };
   } finally {
     await browser.close();
@@ -150,7 +155,7 @@ export async function scanDirectory(rootDir, options = {}) {
       generatedAt: new Date().toISOString(),
       issues,
       routes,
-      summary: summarizeIssues(issues)
+      summary: summarizeIssues(issues, routes.length)
     };
   } finally {
     await browser.close();

@@ -10,6 +10,14 @@
  */
 
 /**
+ * axe rule ID → RGAA 4.1 criterion.
+ *
+ * Criterion numbers follow the official reference:
+ * https://accessibilite.numerique.gouv.fr/methode/criteres-et-tests/
+ * (source: github.com/DISIC/accessibilite.numerique.gouv.fr, RGAA/4.1/criteres.json).
+ * WAI-ARIA usage (valid attributes, valid roles, name/role of components) is checked
+ * by criterion 7.1, as stated in its technical note.
+ *
  * @type {Object.<string, RgaaMapping>}
  */
 const AXE_TO_RGAA = {
@@ -23,7 +31,7 @@ const AXE_TO_RGAA = {
     after: '<img src="/team.jpg" alt="Team gathered in the Lyon office">'
   },
   'input-image-alt': {
-    rgaa: '1.2',
+    rgaa: '1.1',
     severity: 'major',
     title: 'Image button missing alternative text',
     why: 'Screen reader users cannot understand the function of the image button.',
@@ -41,7 +49,7 @@ const AXE_TO_RGAA = {
     after: '<button aria-label="Close dialog"><svg aria-hidden="true"></svg></button>'
   },
   'link-name': {
-    rgaa: '6.1',
+    rgaa: '6.2',
     severity: 'critical',
     title: 'Link has no accessible name',
     why: 'Users navigating links cannot understand where the link leads.',
@@ -122,7 +130,7 @@ const AXE_TO_RGAA = {
     after: '<ul><li>Item</li></ul>'
   },
   dlitem: {
-    rgaa: '9.4',
+    rgaa: '9.3',
     severity: 'minor',
     title: 'Definition list item not wrapped in dt or dd',
     why: 'Definition list must use proper dt/dd elements.',
@@ -131,16 +139,16 @@ const AXE_TO_RGAA = {
     after: '<dl><dt>Term</dt><dd>Definition</dd></dl>'
   },
   'aria-valid-attr': {
-    rgaa: '5.1',
+    rgaa: '7.1',
     severity: 'critical',
     title: 'Invalid ARIA attribute',
     why: 'Invalid ARIA attributes are ignored by assistive technologies.',
     howToFix: 'Use only valid ARIA attribute names.',
-    before: '<div role="button" aria-valu="">Click</div>',
-    after: '<div role="button" aria-label="Click">Click</div>'
+    before: '<input type="checkbox" aria-requried="true">',
+    after: '<input type="checkbox" aria-required="true">'
   },
   'aria-roles': {
-    rgaa: '5.2',
+    rgaa: '7.1',
     severity: 'critical',
     title: 'Invalid ARIA role',
     why: 'Invalid or abstract roles confuse assistive technologies.',
@@ -149,16 +157,16 @@ const AXE_TO_RGAA = {
     after: '<div role="region" aria-label="Content">Content</div>'
   },
   'focus-order-semantics': {
-    rgaa: '7.2',
+    rgaa: '7.1',
     severity: 'major',
-    title: 'Interactive elements have no accessible name',
-    why: 'Focusable elements without accessible names cannot be understood by screen readers.',
-    howToFix: 'Add text content, aria-label, or aria-labelledby to the element.',
+    title: 'Focusable element has no interactive role',
+    why: 'Screen readers announce a focusable element without an interactive role as plain content, so users cannot tell it can be activated.',
+    howToFix: 'Use a native interactive element (button, a, input) or give the element an appropriate ARIA role.',
     before: '<div tabindex="0">Action</div>',
     after: '<button>Action</button>'
   },
   region: {
-    rgaa: '12.2',
+    rgaa: '12.6',
     severity: 'major',
     title: 'Page regions not identified',
     why: 'Screen reader users need landmarks to navigate the page.',

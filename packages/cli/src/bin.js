@@ -2,17 +2,21 @@
 import { Command } from 'commander';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
-import { scanTarget } from '@astro-a11y/core';
+import {
+  scanTarget,
+  SEVERITY_ORDER,
+  SCAN_MODES,
+  isSeverity,
+  isScanMode,
+  resolveFailThreshold,
+  hasIssuesAtOrAbove
+} from '@astro-a11y/core';
 import { renderByFormat } from '@astro-a11y/reporters';
 import { writeOutput } from './output-path.js';
 
-function shouldFail(result, threshold) {
-  const order = ['info', 'minor', 'major', 'critical'];
-  const thresholdIndex = order.indexOf(threshold);
-  if (thresholdIndex === -1) return false;
-  return Object.entries(result.summary.issuesBySeverity).some(
-    ([severity, count]) => count > 0 && order.indexOf(severity) >= thresholdIndex
-  );
+function exitWithError(message) {
+  process.stderr.write(`Error: ${message}\n`);
+  process.exit(1);
 }
 
 const program = new Command();
@@ -39,10 +43,10 @@ program
   )
   .option('--max-redirects <count>', 'Maximum number of followed redirects for remote scans', '3')
   .option('--block-sensitive-ports', 'Block remote targets using sensitive ports')
-  .option('--fail-on <severity>', 'Fail on: critical|major|minor|info', (val) => {
-    const valid = ['critical', 'major', 'minor', 'info'];
-    return valid.includes(val) ? val : '';
-  })
+  .option(
+    '--fail-on <severity>',
+    'Exit with code 1 when issues at or above this severity are found: critical|major|minor|info'
+  )
   .option('--timeout <ms>', 'Page load timeout in milliseconds', '15000')
   .option('--safe-report', 'Strip raw HTML snippets from rendered reports')
   .option('--max-field-length <chars>', 'Maximum report field length before truncation', '5000')
@@ -61,8 +65,14 @@ program
   )
   .action(async (target, options) => {
     const mode = options.mode ?? 'balanced';
+    if (!isScanMode(mode)) {
+      exitWithError(`--mode must be one of ${SCAN_MODES.join('|')}, got: ${mode}`);
+    }
+    if (options.failOn !== undefined && !isSeverity(options.failOn)) {
+      exitWithError(`--fail-on must be one of ${SEVERITY_ORDER.join('|')}, got: ${options.failOn}`);
+    }
     const paranoidMode = mode === 'paranoid';
-    const failOn = options.mode === 'strict' ? 'major' : options.failOn;
+    const failThreshold = resolveFailThreshold({ mode, failOn: options.failOn });
     const timeout = paranoidMode ? 8000 : parseInt(options.timeout, 10);
     const maxRedirects = paranoidMode ? 0 : parseInt(options.maxRedirects, 10);
     const maxFieldLength = parseInt(options.maxFieldLength, 10);
@@ -112,7 +122,7 @@ program
       process.stdout.write(rendered + '\n');
     }
 
-    if (failOn && shouldFail(result, failOn)) {
+    if (hasIssuesAtOrAbove(result.summary, failThreshold)) {
       process.exit(1);
     }
   });

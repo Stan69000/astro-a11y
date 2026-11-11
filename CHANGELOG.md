@@ -2,7 +2,29 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.1.0] - 2024-01-01
+## [Unreleased]
+
+### Fixed
+
+- Astro integration no longer crashes on dynamic routes (`[slug].astro`, `[...path].astro`): pages are resolved from the files Astro generated (`assets` map), and endpoints, redirects and on-demand pages are skipped.
+- `summary.pagesScanned` now counts every scanned page, not only pages with issues.
+- RGAA 4.1 mapping corrected against the official reference: `input-image-alt` → 1.1, `link-name` → 6.2, `dlitem` → 9.3, `aria-valid-attr` / `aria-roles` / `focus-order-semantics` → 7.1, `region` → 12.6.
+- `focus-order-semantics` now describes the actual rule (focusable element without an interactive role).
+- `--fail-on` with an invalid value now exits with an error instead of being silently ignored; same for `--mode`.
+- `--fail-on` now overrides `--mode strict` instead of being ignored.
+- `pnpm example:scan` works from a fresh clone: the fixture lives in `examples/static-site/site/` (the former `dist/` folder was git-ignored and never committed).
+
+### Changed
+
+- Modes now behave the same in the CLI and the integration: `strict` fails on `major`+, `learning` never fails, an explicit `failOn` always wins.
+- The integration validates its options (`mode`, `failOn`, `outputDirName`, `reportFormats`) and accepts `failOn`, `includeTags` and `excludeRules`.
+- `summarizeIssues(issues, pagesScanned)` now requires the number of scanned pages.
+
+### Docs
+
+- README (EN/FR) and landing page: project backed by Le Singe du Numérique, npm availability note, modes table, integration options.
+
+## [0.1.0] - 2026-04-18
 
 ### Added
 
@@ -26,7 +48,7 @@ All notable changes to this project will be documented in this file.
 - `--format` - terminal|json|html|markdown
 - `--timeout` - page load timeout in milliseconds
 - `--progress` - show scanning progress
-- `--include-rules` - comma-separated axe rule IDs to include
+- `--include-tags` - comma-separated axe tags to include (e.g. `wcag2a,wcag2aa`)
 - `--exclude-rules` - comma-separated axe rule IDs to exclude
 - `--allow-unsafe-targets` - allow scanning localhost/private targets
 

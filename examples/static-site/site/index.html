@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Accueil – fixture astro-a11y</title>
+    <style>
+      .muted { color: #9ca3af; background: #ffffff; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Fixture astro-a11y</h1>
+      <!-- image-alt : image sans alternative textuelle -->
+      <img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" width="40" height="40" />
+      <!-- button-name : bouton sans nom accessible -->
+      <button type="button"><svg width="16" height="16" aria-hidden="true"></svg></button>
+      <!-- color-contrast : texte peu contrasté -->
+      <p class="muted">Texte gris clair sur fond blanc.</p>
+      <!-- frame-title : cadre sans titre -->
+      <iframe src="about:blank"></iframe>
+    </main>
+  </body>
+</html>
