@@ -1,0 +1,75 @@
+name: Release
+
+# Publishes the four packages to npm when a version tag (v0.2.0…) is pushed.
+# Authentication uses npm trusted publishing (OIDC): no npm token is stored in
+# the repository. Provenance attestations are generated automatically.
+# One-time setup is described in RELEASING.md.
+
+on:
+  push:
+    tags: ['v*.*.*']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  build:
+    # Installs dependencies and runs project code, so it gets no publish rights.
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+      - run: pnpm install --frozen-lockfile
+      - run: node scripts/check-release.js "$GITHUB_REF_NAME"
+      - run: pnpm lint
+      - run: pnpm test
+      - run: pnpm audit --prod
+      # pnpm pack replaces workspace:* dependencies with the released version.
+      - name: Pack packages
+        run: |
+          mkdir -p tarballs
+          for pkg in core reporters astro-integration cli; do
+            (cd "packages/$pkg" && pnpm pack --pack-destination ../../tarballs)
+          done
+          ls -l tarballs
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: tarballs
+          path: tarballs/*.tgz
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    # Only uploads the already-built tarballs: no install, no project scripts.
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: npm
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+      # Trusted publishing needs npm >= 11.5.1; Node 22 ships npm 10.
+      - run: npm install -g npm@11
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: tarballs
+          path: tarballs
+      # Dependencies first, so installs never resolve a missing version.
+      - name: Publish to npm
+        run: |
+          for pkg in astro-a11y-core astro-a11y-reporters astro-a11y-astro-integration astro-a11y; do
+            npm publish "tarballs/${pkg}-${GITHUB_REF_NAME#v}.tgz" --access public --ignore-scripts
+          done

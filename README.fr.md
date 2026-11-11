@@ -7,7 +7,9 @@
 
 Garde-fous d’accessibilité pour les projets Astro. Porté par [Le Singe du Numérique](https://lesingedunumerique.fr).
 
-> **Pas encore publié sur npm.** Les commandes `pnpm add` / `npx` ci-dessous fonctionneront une fois les paquets publiés. En attendant : clonez ce dépôt, lancez `pnpm install && pnpm build`, puis utilisez `node packages/cli/dist/bin.js` ou importez `packages/astro-integration/dist/index.js`.
+> **Pas encore publié sur npm.** Les commandes `pnpm add` / `npx` ci-dessous fonctionneront une fois les paquets publiés (voir [RELEASING.md](./RELEASING.md)). En attendant : clonez ce dépôt, lancez `pnpm install && pnpm build`, puis utilisez `node packages/cli/dist/bin.js` ou importez `packages/astro-integration/dist/index.js`.
+
+Les scans tournent dans Chromium via Playwright. Installez le navigateur correspondant une fois par machine avec `npx astro-a11y install-browser` (en CI Linux : `npx astro-a11y install-browser --with-deps`).
 
 `astro-a11y` est une boîte à outils orientée Astro qui scanne les pages rendues avec Playwright + axe, enrichit les résultats avec des recommandations actionnables, mappe les problèmes courants vers le RGAA, et s’exécute via CLI ou automatiquement en fin de build Astro.
 
@@ -160,6 +162,7 @@ Un seuil explicite l'emporte toujours : `--fail-on <sévérité>` (CLI) ou `fail
 ```bash
 astro-a11y check <target> [--mode strict|balanced|learning|paranoid] [--format terminal|json|html|markdown] [--fail-on critical|major|minor|info]
 astro-a11y report --input ./reports/report.json [--format terminal|json|html|markdown] [--safe-report]
+astro-a11y install-browser [--with-deps]
 ```
 
 Exemples :

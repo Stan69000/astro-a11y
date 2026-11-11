@@ -1,11 +1,11 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { chromium } from 'playwright';
 import AxeBuilder from '@axe-core/playwright';
 import { assertAllowedRemoteTarget, resolveSafeRemoteUrl } from './security.js';
 import { collectHtmlRoutesFromDirectory } from './routes.js';
 import { startStaticServer } from './static-server.js';
 import { enrichViolation } from './mappings.js';
+import { launchChromium } from './browser.js';
 
 const DEFAULT_TIMEOUT_MS = 15000;
 const isCI = process.env.CI === 'true';
@@ -86,7 +86,7 @@ export async function scanRemoteUrl(url, options = {}) {
   const resolvedUrl = await resolveSafeRemoteUrl(url, securityOptions);
   const timeout = options.timeout ?? DEFAULT_TIMEOUT_MS;
 
-  const browser = await chromium.launch({
+  const browser = await launchChromium({
     headless: true,
     args: resolveLaunchArgs(options)
   });
@@ -123,7 +123,7 @@ export async function scanDirectory(rootDir, options = {}) {
   const progress = options.onProgress;
   const routes = await resolveDirectoryRoutes(rootDir, options.routes);
   const server = await startStaticServer(rootDir);
-  const browser = await chromium.launch({
+  const browser = await launchChromium({
     headless: true,
     args: resolveLaunchArgs(options)
   });
