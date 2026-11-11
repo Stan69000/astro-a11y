@@ -5,7 +5,9 @@
 [![Node.js Version](https://img.shields.io/node/v/astro-a11y)](https://nodejs.org)
 [![RGAA Version](https://img.shields.io/badge/RGAA-4.1-green)](https://accessibilite.numerique.gouv.fr/)
 
-Garde-fous d’accessibilité pour les projets Astro.
+Garde-fous d’accessibilité pour les projets Astro. Porté par [Le Singe du Numérique](https://lesingedunumerique.fr).
+
+> **Pas encore publié sur npm.** Les commandes `pnpm add` / `npx` ci-dessous fonctionneront une fois les paquets publiés. En attendant : clonez ce dépôt, lancez `pnpm install && pnpm build`, puis utilisez `node packages/cli/dist/bin.js` ou importez `packages/astro-integration/dist/index.js`.
 
 `astro-a11y` est une boîte à outils orientée Astro qui scanne les pages rendues avec Playwright + axe, enrichit les résultats avec des recommandations actionnables, mappe les problèmes courants vers le RGAA, et s’exécute via CLI ou automatiquement en fin de build Astro.
 
@@ -142,10 +144,21 @@ npx astro-a11y check ./dist --format json --output reports/report.json
 npx astro-a11y report --input reports/report.json --format html --output reports/report.html --safe-report
 ```
 
+## Modes et échec du build
+
+| Mode | Rôle | Échoue par défaut ? |
+| --- | --- | --- |
+| `balanced` | Scan par défaut | Non (CLI) · seulement avec `failOnBuild: true` (intégration) |
+| `strict` | Même scan, seuil plus exigeant | Oui, dès les problèmes `major` |
+| `learning` | Rapport seul, pour les ateliers et les premiers audits | Jamais |
+| `paranoid` | Scans distants avec les garde-fous les plus stricts (pas de redirection, ports sensibles bloqués, rapports nettoyés) | Non |
+
+Un seuil explicite l'emporte toujours : `--fail-on <sévérité>` (CLI) ou `failOn` (intégration), avec `critical`, `major`, `minor` ou `info`. Un mode ou un seuil invalide est refusé avec une erreur au lieu d'être ignoré en silence.
+
 ## CLI
 
 ```bash
-astro-a11y check <target> [--mode strict|balanced|learning|paranoid] [--format terminal|json|html|markdown]
+astro-a11y check <target> [--mode strict|balanced|learning|paranoid] [--format terminal|json|html|markdown] [--fail-on critical|major|minor|info]
 astro-a11y report --input ./reports/report.json [--format terminal|json|html|markdown] [--safe-report]
 ```
 
@@ -153,6 +166,7 @@ Exemples :
 
 ```bash
 astro-a11y check ./dist --mode balanced
+astro-a11y check ./dist --fail-on critical
 astro-a11y check https://example.com --mode paranoid --allowed-domains example.com
 astro-a11y check https://example.com --format json --output reports/report.json
 astro-a11y report --input reports/report.json --format html --output reports/report.html --safe-report
@@ -177,6 +191,25 @@ export default defineConfig({
 
 Les rapports sont écrits dans `<dist>/astro-a11y/` par défaut.
 
+Toutes les pages pré-rendues sont analysées, y compris celles générées par des routes dynamiques (`[slug].astro`, `[...path].astro`). Les endpoints (RSS, sitemap…), les redirections et les pages rendues à la demande (SSR) sont ignorés, car ils ne produisent pas de fichier HTML statique.
+
+| Option | Défaut | Description |
+| --- | --- | --- |
+| `mode` | `'balanced'` | `strict`, `balanced`, `learning` ou `paranoid` (voir plus haut) |
+| `failOnBuild` | `false` | Fait échouer le build dès les problèmes `major` |
+| `failOn` | — | Seuil d'échec explicite, prioritaire sur le mode |
+| `writeReports` | `true` | Écrit les fichiers de rapport |
+| `outputDirName` | `'astro-a11y'` | Dossier des rapports, relatif au dossier de build |
+| `reportFormats` | `['json', 'html', 'markdown']` | Rapports à écrire |
+| `includeTags` | — | Tags axe à exécuter, ex. `['wcag2a', 'wcag2aa']` |
+| `excludeRules` | — | Règles axe à ignorer |
+| `timeout` | `15000` | Délai de chargement d'une page (ms) |
+| `showProgress` | `false` | Affiche chaque page analysée |
+
+## Porté par Le Singe du Numérique
+
+`astro-a11y` est porté par [Le Singe du Numérique](https://lesingedunumerique.fr), association de sensibilisation au numérique et à la cybersécurité. C'est le projet compagnon de [rgaa-audit](https://stan69000.github.io/rgaa-audit/).
+
 ## Pour la communauté
 
 Le projet est maintenu par une seule personne, et les contributions sont bienvenues.
@@ -192,7 +225,7 @@ Le projet est maintenu par une seule personne, et les contributions sont bienven
 - `packages/reporters` - reporters terminal, JSON, HTML, Markdown
 - `packages/cli` - point d’entrée CLI
 - `packages/astro-integration` - intégration Astro
-- `examples/static-site` - fixture de site statique
+- `examples/static-site` - fixture HTML statique utilisée par `pnpm example:scan`
 - `tests` - tests automatiques
 
 ## Positionnement sécurité

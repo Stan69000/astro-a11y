@@ -42,13 +42,16 @@ export interface ScanResult {
 }
 
 export interface ScanSummary {
+  /** Number of pages actually analysed, including pages without issues. */
   pagesScanned: number;
   issuesBySeverity: Record<Severity, number>;
   failed: boolean;
 }
 
+export type ScanMode = "strict" | "balanced" | "learning" | "paranoid";
+
 export interface ScanOptions {
-  mode?: string;
+  mode?: ScanMode;
   allowUnsafeTargets?: boolean;
   allowedDomains?: string[];
   maxRedirects?: number;
@@ -64,4 +67,17 @@ export interface ProgressInfo {
   current: number;
   total: number;
   route: string;
+}
+
+export interface AstroA11yOptions {
+  mode?: ScanMode;
+  failOnBuild?: boolean;
+  failOn?: Severity;
+  writeReports?: boolean;
+  outputDirName?: string;
+  reportFormats?: Array<"json" | "html" | "markdown">;
+  includeTags?: string[];
+  excludeRules?: string[];
+  timeout?: number;
+  showProgress?: boolean;
 }

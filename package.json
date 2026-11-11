@@ -10,7 +10,7 @@
     "lint": "node scripts/check-workspace.js && eslint packages/ tests/",
     "format": "prettier --write 'packages/**/*.js' 'tests/**/*.js' 'scripts/**/*.js'",
     "prepare": "husky",
-    "example:scan": "node packages/cli/dist/bin.js check ./examples/static-site/dist --mode learning",
+    "example:scan": "node packages/cli/dist/bin.js check ./examples/static-site/site --mode learning",
     "security:audit": "corepack pnpm audit --prod"
   },
   "devDependencies": {
