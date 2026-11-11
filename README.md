@@ -127,7 +127,7 @@ npx astro-a11y report --input reports/report.json --format html --output reports
 | --- | --- | --- |
 | `balanced` | Default scan | No (CLI) · only with `failOnBuild: true` (integration) |
 | `strict` | Same scan, stricter gate | Yes, on `major` issues and above |
-| `learning` | Report-only, for workshops and first audits | Never |
+| `learning` | Report-only, for workshops and first audits: issues grouped by topic, with who is affected and how to experience the problem yourself | Never |
 | `paranoid` | Remote scans with the strictest security guards (no redirects, sensitive ports blocked, sanitized reports) | No |
 
 An explicit threshold always wins: `--fail-on <severity>` (CLI) or `failOn` (integration), with `critical`, `major`, `minor` or `info`. An invalid mode or threshold is rejected with an error instead of being silently ignored.
@@ -139,6 +139,18 @@ An explicit threshold always wins: `--fail-on <severity>` (CLI) or `failOn` (int
 `--lang fr` (CLI), `lang: 'fr'` (integration) or `lang: fr` (Action) write issue texts and reports in French.
 
 Every report ends with a **per-criterion view**: for each criterion touched by the rules that ran, *Issues found*, *To check manually* (axe could not decide), *No issue detected* or *Not applicable*. *No issue detected* only means the automated checks found nothing: most criteria also need a human check.
+
+## Learning mode (workshops)
+
+`--mode learning --lang fr` turns the report into teaching material for workshops, associations or small municipalities:
+
+- one topic per rule, most severe first, explained in plain words;
+- **who is affected** (screen reader users, keyboard users, people with low vision…);
+- **see it for yourself**: a simple way to experience the problem (grayscale screen, keyboard only, free screen reader…);
+- the fix with a before/after example, and every page and element concerned;
+- what already works, and what must be checked by hand.
+
+It never fails a build. The HTML report is itself checked with axe-core in the test suite.
 
 ## Keyboard checks
 
