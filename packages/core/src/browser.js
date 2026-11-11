@@ -41,6 +41,14 @@ export function installChromium({ withDeps = false } = {}) {
  */
 export function explainLaunchError(error) {
   const message = error instanceof Error ? error.message : String(error);
+  if (message.includes('Chromium sandboxing failed')) {
+    return new Error(
+      'The paranoid mode requires the Chromium sandbox, which this system cannot provide ' +
+        '(running as root, or user namespaces disabled). Run as a regular user, or use another mode ' +
+        'inside an isolated container.',
+      { cause: error }
+    );
+  }
   if (!message.includes("Executable doesn't exist")) return error;
   return new Error(
     'Chromium for Playwright is not installed. Run `npx astro-a11y install-browser`, ' +

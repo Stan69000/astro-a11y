@@ -4,6 +4,9 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    # Let new releases age a week: most malicious versions are found and pulled within days.
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 5
     groups:
       npm-patch-minor:
@@ -17,6 +20,8 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 3
     groups:
       actions-updates:

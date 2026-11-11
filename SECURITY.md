@@ -8,7 +8,7 @@ Only the latest minor release line is supported for security fixes.
 
 Please do not open a public issue for a suspected vulnerability.
 
-Instead, send a private report with:
+Instead, use GitHub's private reporting: **Security → Report a vulnerability** on this repository. Include:
 - affected package and version
 - impact
 - reproduction steps
@@ -25,6 +25,9 @@ This tool is intentionally designed to reduce attack surface:
 - no telemetry
 - remote targets blocked by default if they resolve to localhost, private IP ranges, or metadata-style hosts
 - remote redirects are validated hop-by-hop and capped by default
+- every request made by the browser while scanning (images, scripts, frames, fetch, WebSockets) goes through the same checks: a scanned page cannot reach the scanner's private network, unless `--allow-unsafe-targets` is set
+- the local static server only serves real files inside the build directory (symbolic links pointing outside are refused)
+- sitemap crawling keeps same-host pages only, with caps on pages, documents and response size
 - only `http`/`https` targets are accepted
 - minimal dependency footprint
 - short request and browser timeouts
@@ -35,9 +38,18 @@ This tool is intentionally designed to reduce attack surface:
 
 - `--allow-unsafe-targets` weakens SSRF protections and should only be used in trusted test environments.
 - For external or untrusted scan targets, run `astro-a11y` from an isolated VM/container with constrained network egress.
-- Use `--mode paranoid` for high-risk scans (sandbox enforced, redirects disabled, stricter network checks, safe report output).
+- Use `--mode paranoid` for high-risk scans: Chromium's OS sandbox enabled (the scan fails instead of running unsandboxed when the system cannot provide it, e.g. as root), redirects disabled, sensitive ports blocked, safe report output. In other modes, as with Playwright's default, Chromium runs without its OS sandbox.
+
+## Known limitations
+
+- DNS rebinding: target checks resolve DNS before the browser does. A domain that switches to a private address between the two lookups is not caught. Scan untrusted sites from an isolated environment with restricted egress.
+- Pages are rendered with JavaScript enabled: a hostile page runs code in the scanning browser.
 
 ## Supply chain hygiene
+
+- npm packages are published from GitHub Actions with trusted publishing (no stored token) and provenance attestations (see RELEASING.md).
+- Workflows pin every action to a commit SHA, never persist checkout credentials, and are checked with zizmor on every change; code is analysed with CodeQL.
+- Dependabot waits 7 days before proposing a new release.
 
 - In CI, install dependencies with lockfile enforcement (`pnpm install --frozen-lockfile`).
 - Prefer `pnpm install --ignore-scripts` in constrained/security-sensitive environments where install hooks are not required.
