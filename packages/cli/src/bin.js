@@ -3,6 +3,7 @@ import { Command } from 'commander';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import {
+  installChromium,
   scanTarget,
   SEVERITY_ORDER,
   SCAN_MODES,
@@ -164,6 +165,15 @@ program
     } else {
       process.stdout.write(rendered + '\n');
     }
+  });
+
+program
+  .command('install-browser')
+  .description('Download the Chromium build used for scans (matches the bundled Playwright version)')
+  .option('--with-deps', 'Also install system dependencies (Linux, requires root)')
+  .action(async (options) => {
+    const code = await installChromium({ withDeps: options.withDeps === true });
+    process.exit(code);
   });
 
 program.parse();

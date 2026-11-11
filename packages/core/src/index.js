@@ -21,3 +21,10 @@ export {
   resolveFailThreshold,
   hasIssuesAtOrAbove
 } from './thresholds.js';
+export {
+  browserInstallCommand,
+  explainLaunchError,
+  installChromium,
+  launchChromium,
+  playwrightCliPath
+} from './browser.js';

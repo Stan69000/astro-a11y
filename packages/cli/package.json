@@ -1,12 +1,40 @@
 {
   "name": "astro-a11y",
   "version": "0.1.0",
+  "description": "Accessibility guardrails for Astro sites and static builds: axe-core scans with RGAA 4.1 mapping.",
+  "keywords": [
+    "accessibility",
+    "a11y",
+    "rgaa",
+    "wcag",
+    "astro",
+    "cli"
+  ],
+  "license": "MIT",
+  "author": "Stan Bouchet",
+  "homepage": "https://stan69000.github.io/astro-a11y/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Stan69000/astro-a11y.git",
+    "directory": "packages/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/Stan69000/astro-a11y/issues"
+  },
   "type": "module",
+  "main": "./dist/bin.js",
   "bin": {
     "astro-a11y": "./dist/bin.js"
   },
-  "main": "./dist/bin.js",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "node ../../scripts/copy-package.js src dist"
   },

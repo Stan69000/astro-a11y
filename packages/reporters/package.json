@@ -1,12 +1,38 @@
 {
   "name": "@astro-a11y/reporters",
   "version": "0.1.0",
+  "description": "Terminal, JSON, HTML and Markdown reporters for astro-a11y.",
+  "keywords": [
+    "accessibility",
+    "a11y",
+    "rgaa",
+    "report"
+  ],
+  "license": "MIT",
+  "author": "Stan Bouchet",
+  "homepage": "https://stan69000.github.io/astro-a11y/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Stan69000/astro-a11y.git",
+    "directory": "packages/reporters"
+  },
+  "bugs": {
+    "url": "https://github.com/Stan69000/astro-a11y/issues"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "exports": {
     ".": "./dist/index.js"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "node ../../scripts/copy-package.js src dist"
   }

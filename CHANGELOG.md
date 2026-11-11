@@ -4,7 +4,15 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- `astro-a11y install-browser [--with-deps]` downloads the Chromium build matching the bundled Playwright; a missing browser now fails with this command in the error message.
+- Release workflow (`.github/workflows/release.yml`): npm trusted publishing (OIDC, no stored token) with provenance; `scripts/check-release.js` and `RELEASING.md`.
+- npm metadata on every package (license, repository, homepage, engines, README, LICENSE).
+
 ### Fixed
+
+- HTML reports written by astro-a11y are no longer scanned as pages when a build directory is scanned again.
 
 - Astro integration no longer crashes on dynamic routes (`[slug].astro`, `[...path].astro`): pages are resolved from the files Astro generated (`assets` map), and endpoints, redirects and on-demand pages are skipped.
 - `summary.pagesScanned` now counts every scanned page, not only pages with issues.

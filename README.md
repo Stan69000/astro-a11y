@@ -7,7 +7,9 @@ English | [Français](./README.fr.md)
 
 Accessibility guardrails for Astro projects. Backed by [Le Singe du Numérique](https://lesingedunumerique.fr).
 
-> **Not published on npm yet.** The `pnpm add` / `npx` commands below will work once the packages are released. Until then, clone this repository, run `pnpm install && pnpm build`, then use `node packages/cli/dist/bin.js` or import `packages/astro-integration/dist/index.js`.
+> **Not published on npm yet.** The `pnpm add` / `npx` commands below will work once the packages are released (see [RELEASING.md](./RELEASING.md)). Until then, clone this repository, run `pnpm install && pnpm build`, then use `node packages/cli/dist/bin.js` or import `packages/astro-integration/dist/index.js`.
+
+Scans run in Chromium through Playwright. Install the matching browser once per machine with `npx astro-a11y install-browser` (on Linux CI: `npx astro-a11y install-browser --with-deps`).
 
 `astro-a11y` is an Astro-first accessibility toolkit that scans rendered pages with Playwright + axe, enriches findings with actionable guidance, maps common issues to RGAA criteria, and runs from the CLI or at the end of an Astro build.
 
@@ -135,6 +137,7 @@ An explicit threshold always wins: `--fail-on <severity>` (CLI) or `failOn` (int
 ```bash
 astro-a11y check <target> [--mode strict|balanced|learning|paranoid] [--format terminal|json|html|markdown] [--fail-on critical|major|minor|info]
 astro-a11y report --input ./reports/report.json [--format terminal|json|html|markdown] [--safe-report]
+astro-a11y install-browser [--with-deps]
 ```
 
 Examples:
