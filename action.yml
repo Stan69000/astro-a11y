@@ -27,6 +27,12 @@ inputs:
   allowed-domains:
     description: Comma-separated domain allowlist for URL targets.
     default: ''
+  sitemap:
+    description: "For a URL target: 'true' to scan the pages of the site sitemaps, or the URL of a specific sitemap."
+    default: ''
+  max-pages:
+    description: Maximum number of pages scanned from the sitemaps.
+    default: '50'
   comment:
     description: 'Post or update a comment on the pull request (needs the pull-requests: write permission).'
     default: 'true'
@@ -78,6 +84,8 @@ runs:
         A11Y_INCLUDE_TAGS: ${{ inputs.include-tags }}
         A11Y_EXCLUDE_RULES: ${{ inputs.exclude-rules }}
         A11Y_ALLOWED_DOMAINS: ${{ inputs.allowed-domains }}
+        A11Y_SITEMAP: ${{ inputs.sitemap }}
+        A11Y_MAX_PAGES: ${{ inputs.max-pages }}
         REPORT_DIR: astro-a11y-report
       run: |
         args=(check "$A11Y_TARGET" --mode "$A11Y_MODE" --format json --output "$REPORT_DIR/report.json")
@@ -86,6 +94,11 @@ runs:
         [ -n "$A11Y_INCLUDE_TAGS" ] && args+=(--include-tags "$A11Y_INCLUDE_TAGS")
         [ -n "$A11Y_EXCLUDE_RULES" ] && args+=(--exclude-rules "$A11Y_EXCLUDE_RULES")
         [ -n "$A11Y_ALLOWED_DOMAINS" ] && args+=(--allowed-domains "$A11Y_ALLOWED_DOMAINS")
+        if [ "$A11Y_SITEMAP" = "true" ]; then
+          args+=(--sitemap --max-pages "$A11Y_MAX_PAGES")
+        elif [ -n "$A11Y_SITEMAP" ]; then
+          args+=(--sitemap "$A11Y_SITEMAP" --max-pages "$A11Y_MAX_PAGES")
+        fi
 
         set +e
         node "$CLI" "${args[@]}"

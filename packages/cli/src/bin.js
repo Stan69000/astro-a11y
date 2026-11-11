@@ -79,6 +79,11 @@ program
     'Known issues file: only issues missing from it count as new and can fail the run'
   )
   .option('--write-baseline <file>', 'Write the issues found by this scan to a baseline file')
+  .option(
+    '--sitemap [url]',
+    'For a URL target: scan the pages listed in the site sitemaps (robots.txt, /sitemap-index.xml, /sitemap.xml) or in the given sitemap'
+  )
+  .option('--max-pages <count>', 'Maximum number of pages scanned with --sitemap', '50')
   .action(async (target, options) => {
     const mode = options.mode ?? 'balanced';
     if (!isScanMode(mode)) {
@@ -118,6 +123,15 @@ program
           if (current === total) process.stdout.write('\n');
         }
       : undefined;
+    const maxPages = parseInt(options.maxPages, 10);
+    if (isNaN(maxPages) || maxPages <= 0) {
+      exitWithError(`--max-pages must be a positive number, got: ${options.maxPages}`);
+    }
+    if (options.sitemap && !/^https?:\/\//i.test(target)) {
+      exitWithError(
+        '--sitemap only applies to URL targets; a build directory is crawled from its HTML files.'
+      );
+    }
     let baseline;
     if (options.baseline) {
       try {
@@ -136,7 +150,10 @@ program
       timeout,
       onProgress,
       includeTags: options.includeTags,
-      excludeRules: options.excludeRules
+      excludeRules: options.excludeRules,
+      sitemap: Boolean(options.sitemap),
+      sitemapUrl: typeof options.sitemap === 'string' ? options.sitemap : undefined,
+      maxPages
     });
     const result = baseline ? applyBaseline(scanResult, baseline) : scanResult;
     if (options.writeBaseline) {
@@ -158,6 +175,13 @@ program
       process.stdout.write(rendered + '\n');
     }
 
+    for (const pageError of result.pageErrors ?? []) {
+      process.stderr.write(`Warning: could not scan ${pageError.page}: ${pageError.message}\n`);
+    }
+    // A page that could not be scanned must not let a gated run pass silently.
+    if (failThreshold !== null && result.pageErrors?.length > 0) {
+      process.exit(1);
+    }
     if (hasIssuesAtOrAbove(result.summary, failThreshold)) {
       process.exit(1);
     }

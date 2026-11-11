@@ -196,7 +196,7 @@ Entrées : `target`, `mode`, `fail-on`, `baseline`, `include-tags`, `exclude-rul
 ## CLI
 
 ```bash
-astro-a11y check <target> [--mode strict|balanced|learning|paranoid] [--format terminal|json|html|markdown] [--fail-on critical|major|minor|info]
+astro-a11y check <target> [--mode strict|balanced|learning|paranoid] [--format terminal|json|html|markdown|github] [--fail-on critical|major|minor|info] [--baseline <file>] [--sitemap [url]]
 astro-a11y report --input ./reports/report.json [--format terminal|json|html|markdown] [--safe-report]
 astro-a11y install-browser [--with-deps]
 ```
@@ -211,6 +211,15 @@ astro-a11y check https://example.com --mode paranoid --allowed-domains example.c
 astro-a11y check https://example.com --format json --output reports/report.json
 astro-a11y report --input reports/report.json --format html --output reports/report.html --safe-report
 ```
+
+### Analyser tout un site déployé
+
+```bash
+astro-a11y check https://example.com --sitemap --max-pages 100 --allowed-domains example.com
+astro-a11y check https://example.com --sitemap https://example.com/sitemap-0.xml
+```
+
+`--sitemap` lit les sitemaps déclarés dans `robots.txt`, puis `/sitemap-index.xml` (généré par `@astrojs/sitemap`) et `/sitemap.xml`. Il suit les index de sitemaps et ne garde que les pages du même nom d'hôte, dans la limite de `--max-pages` (50 par défaut). Chaque requête passe par les mêmes garde-fous qu'un scan d'URL unique (adresses privées, redirections, liste de domaines autorisés). Une page impossible à charger (HTTP 4xx/5xx, délai dépassé) est listée dans le rapport ; si un seuil d'échec est défini, elle fait échouer l'exécution.
 
 ## Intégration Astro
 

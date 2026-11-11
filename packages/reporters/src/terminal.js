@@ -14,6 +14,10 @@ export function renderTerminal(result) {
       `New since baseline: critical=${fresh.critical}, major=${fresh.major}, minor=${fresh.minor}, info=${fresh.info} · fixed elements: ${result.summary.baseline?.fixedElements ?? 0}`
     );
   }
+  if (result.pageErrors?.length) {
+    lines.push(`Pages that could not be scanned: ${result.pageErrors.length}`);
+    for (const error of result.pageErrors) lines.push(`  - ${error.page}: ${error.message}`);
+  }
   lines.push("");
 
   for (const issue of result.issues) {

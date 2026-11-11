@@ -56,6 +56,10 @@ export function renderGithubComment(result, options = {}) {
     lines.push('');
   }
 
+  if (result.pageErrors?.length) {
+    lines.push(`**${result.pageErrors.length} page(s) could not be scanned:** see the full report.`, '');
+  }
+
   const issues = [...result.issues].sort(byPriority);
   if (issues.length === 0) {
     lines.push('No accessibility issues detected by the configured automated checks.');

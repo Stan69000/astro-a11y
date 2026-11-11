@@ -52,5 +52,12 @@ export function renderMarkdown(result) {
     lines.push("No accessibility issues detected by the configured automated checks.");
   }
 
+  if (result.pageErrors?.length) {
+    lines.push("");
+    lines.push("## Pages that could not be scanned");
+    lines.push("");
+    for (const error of result.pageErrors) lines.push(`- ${escapeMd(error.page)}: ${escapeMd(error.message)}`);
+  }
+
   return lines.join("\n");
 }

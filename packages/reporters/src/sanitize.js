@@ -48,6 +48,9 @@ export function sanitizeResult(result, options = {}) {
     mode: clip(result.mode, maxFieldLength),
     generatedAt: clip(result.generatedAt, maxFieldLength),
     issues: Array.isArray(result.issues) ? result.issues.map((issue) => sanitizeIssue(issue, sanitizedOptions)) : [],
-    routes: Array.isArray(result.routes) ? result.routes.map((route) => clip(route, maxFieldLength)) : result.routes
+    routes: Array.isArray(result.routes) ? result.routes.map((route) => clip(route, maxFieldLength)) : result.routes,
+    pageErrors: Array.isArray(result.pageErrors)
+      ? result.pageErrors.map((error) => ({ page: clip(error.page, maxFieldLength), message: clip(error.message, maxFieldLength) }))
+      : result.pageErrors
   };
 }
