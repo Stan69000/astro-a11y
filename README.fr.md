@@ -3,7 +3,7 @@
 [English](./README.md) | Français
 
 [![Node.js Version](https://img.shields.io/node/v/astro-a11y)](https://nodejs.org)
-[![RGAA Version](https://img.shields.io/badge/RGAA-4.1-green)](https://accessibilite.numerique.gouv.fr/)
+[![RGAA Version](https://img.shields.io/badge/RGAA-4.1.2-green)](https://accessibilite.numerique.gouv.fr/)
 
 Garde-fous d’accessibilité pour les projets Astro. Porté par [Le Singe du Numérique](https://lesingedunumerique.fr).
 
@@ -272,6 +272,8 @@ Toutes les pages pré-rendues sont analysées, y compris celles générées par 
 ## Porté par Le Singe du Numérique
 
 `astro-a11y` est porté par [Le Singe du Numérique](https://lesingedunumerique.fr), association de sensibilisation au numérique et à la cybersécurité. C'est le projet compagnon de [rgaa-audit](https://stan69000.github.io/rgaa-audit/).
+
+Les deux outils partagent le même référentiel RGAA (version 4.1.2, intitulés officiels des 106 critères, générés depuis la source DINUM) : `packages/core/src/rgaa-criteria.cjs` est une copie exacte du fichier de rgaa-audit, synchronisée avec `node scripts/sync-rgaa-reference.js` et vérifiée chaque semaine par le workflow *RGAA reference*.
 
 ## Pour la communauté
 

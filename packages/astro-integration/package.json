@@ -1,7 +1,7 @@
 {
   "name": "@astro-a11y/astro-integration",
   "version": "0.1.0",
-  "description": "Astro integration that scans every built page for accessibility issues, with RGAA 4.1 mapping.",
+  "description": "Astro integration that scans every built page for accessibility issues, with RGAA 4.1.2 mapping.",
   "keywords": [
     "accessibility",
     "a11y",

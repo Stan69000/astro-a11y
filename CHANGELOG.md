@@ -6,6 +6,8 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- RGAA reference shared with rgaa-audit (RGAA 4.1.2, 13 topics, official titles of the 106 criteria): issues now carry `rgaaTitle`, `RGAA_VERSION` is `4.1.2`, a test checks that every mapped criterion exists, `scripts/sync-rgaa-reference.js` and a weekly drift check keep the copy identical to rgaa-audit's.
+
 - Keyboard checks with real key presses: keyboard trap (RGAA 12.9), invisible focus (RGAA 10.7), broken skip link (RGAA 12.7). On by default; `--no-keyboard`, `keyboard: false` or the Action's `keyboard` input turn them off. Real-browser tests in `pnpm test:e2e` and a CI job.
 
 - `--sitemap [url]` and `--max-pages <n>`: scan every page of a deployed site from its sitemaps (robots.txt, `/sitemap-index.xml`, `/sitemap.xml`, sitemap indexes), same-host only, with the remote security guards on every request. Unreachable pages are reported (`pageErrors`) and fail a gated run. Also `sitemap` / `max-pages` inputs in the GitHub Action.

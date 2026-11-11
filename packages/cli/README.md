@@ -1,6 +1,6 @@
 # astro-a11y
 
-CLI that scans a static build folder or a live URL with Playwright + axe-core, maps findings to RGAA 4.1 criteria and renders terminal, JSON, HTML or Markdown reports.
+CLI that scans a static build folder or a live URL with Playwright + axe-core, maps findings to RGAA 4.1.2 criteria and renders terminal, JSON, HTML or Markdown reports.
 
 ```bash
 npx playwright install chromium

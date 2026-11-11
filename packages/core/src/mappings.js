@@ -9,12 +9,14 @@
  * @property {string} [after]
  */
 
+import { criterionTitle, RGAA_VERSION } from './rgaa.js';
+
 /**
- * axe rule ID → RGAA 4.1 criterion.
+ * axe rule ID → RGAA criterion.
  *
- * Criterion numbers follow the official reference:
+ * Criterion numbers follow the official reference
  * https://accessibilite.numerique.gouv.fr/methode/criteres-et-tests/
- * (source: github.com/DISIC/accessibilite.numerique.gouv.fr, RGAA/4.1/criteres.json).
+ * (shared with rgaa-audit, see rgaa.js); a test checks that every criterion exists.
  * WAI-ARIA usage (valid attributes, valid roles, name/role of components) is checked
  * by criterion 7.1, as stated in its technical note.
  *
@@ -161,7 +163,8 @@ const AXE_TO_RGAA = {
     severity: 'major',
     title: 'Focusable element has no interactive role',
     why: 'Screen readers announce a focusable element without an interactive role as plain content, so users cannot tell it can be activated.',
-    howToFix: 'Use a native interactive element (button, a, input) or give the element an appropriate ARIA role.',
+    howToFix:
+      'Use a native interactive element (button, a, input) or give the element an appropriate ARIA role.',
     before: '<div tabindex="0">Action</div>',
     after: '<button>Action</button>'
   },
@@ -176,7 +179,7 @@ const AXE_TO_RGAA = {
   }
 };
 
-export const RGAA_VERSION = '4.1';
+export { RGAA_VERSION };
 
 export function mapAxeToRgaa(ruleId) {
   return (
@@ -196,6 +199,7 @@ export function enrichViolation(violation, page, mode) {
   return {
     id: violation.id,
     rgaa: mapping.rgaa,
+    rgaaTitle: criterionTitle(mapping.rgaa),
     page,
     severity: mapping.severity,
     title: mapping.title,
