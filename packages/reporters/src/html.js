@@ -1,3 +1,10 @@
+/**
+ * Marks the HTML report so the scanner never audits its own reports when a
+ * build directory is scanned again. Must match REPORT_GENERATOR in
+ * packages/core/src/routes.js.
+ */
+export const REPORT_GENERATOR = "astro-a11y-report";
+
 function escapeHtml(value) {
   return String(value ?? "")
     .replaceAll("&", "&amp;")
@@ -45,6 +52,7 @@ export function renderHtml(result) {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="${REPORT_GENERATOR}">
 <title>astro-a11y report</title>
 <style>
 body { font-family: Inter, system-ui, sans-serif; margin: 0; background: #f5f7fb; color: #172033; }
