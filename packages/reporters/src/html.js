@@ -26,7 +26,7 @@ function badgeClass(severity) {
 export function renderHtml(result) {
   const issueCards = result.issues.map((issue) => `
     <article class="card">
-      <div class="${badgeClass(issue.severity)}">${escapeHtml(issue.severity.toUpperCase())}</div>
+      <div class="${badgeClass(issue.severity)}">${escapeHtml(issue.severity.toUpperCase())}</div>${issue.isNew ? ' <div class="badge badge-new">NEW</div>' : ""}
       <h2>${escapeHtml(issue.title)}</h2>
       <p><strong>Page:</strong> ${escapeHtml(issue.page)}</p>
       <p><strong>Rule:</strong> ${escapeHtml(issue.id)} · <strong>RGAA:</strong> ${escapeHtml(issue.rgaa)}</p>
@@ -69,6 +69,7 @@ header { padding: 20px; margin-bottom: 18px; }
 .badge-major { background: #fff7ed; color: #9a3412; }
 .badge-minor { background: #eff6ff; color: #1d4ed8; }
 .badge-info { background: #ecfeff; color: #155e75; }
+.badge-new { background: #172033; color: #ffffff; }
 .example { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-top: 12px; }
 pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #0f172a; color: #e2e8f0; padding: 12px; border-radius: 12px; }
 .node { border-top: 1px solid #e5e7eb; padding-top: 12px; margin-top: 12px; }
@@ -84,6 +85,7 @@ a { color: #1d4ed8; }
     <h1>astro-a11y report</h1>
     <p><strong>Target:</strong> ${escapeHtml(result.target)}</p>
     <p><strong>Mode:</strong> ${escapeHtml(result.mode)} · <strong>Generated:</strong> ${escapeHtml(result.generatedAt)}</p>
+    ${result.summary.newIssuesBySeverity ? `<p><strong>New since baseline:</strong> critical ${result.summary.newIssuesBySeverity.critical}, major ${result.summary.newIssuesBySeverity.major}, minor ${result.summary.newIssuesBySeverity.minor}, info ${result.summary.newIssuesBySeverity.info} · <strong>Fixed elements:</strong> ${result.summary.baseline?.fixedElements ?? 0}</p>` : ""}
   </header>
 
   <section class="kpis" aria-labelledby="summary-heading">

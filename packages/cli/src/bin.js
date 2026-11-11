@@ -3,7 +3,10 @@ import { Command } from 'commander';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import {
+  applyBaseline,
+  createBaseline,
   installChromium,
+  parseBaseline,
   scanTarget,
   SEVERITY_ORDER,
   SCAN_MODES,
@@ -32,15 +35,18 @@ program
   .description('Scan a local directory or remote URL for accessibility issues')
   .argument('<target>', 'Local directory path or remote URL')
   .option('--mode <mode>', 'Scan mode: strict|balanced|learning|paranoid', 'balanced')
-  .option('-f, --format <format>', 'Output format: terminal|json|html|markdown', 'terminal')
+  .option('-f, --format <format>', 'Output format: terminal|json|html|markdown|github', 'terminal')
   .option('--output-format <format>', 'Alias for --format')
   .option('-o, --output <path>', 'Output file path')
   .option('--allow-unsafe-targets', 'Allow scanning localhost/private remote targets')
-  .option('--allowed-domains <domains>', 'Comma-separated domain allowlist for remote targets', (val) =>
-    val
-      .split(',')
-      .map((s) => s.trim())
-      .filter(Boolean)
+  .option(
+    '--allowed-domains <domains>',
+    'Comma-separated domain allowlist for remote targets',
+    (val) =>
+      val
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean)
   )
   .option('--max-redirects <count>', 'Maximum number of followed redirects for remote scans', '3')
   .option('--block-sensitive-ports', 'Block remote targets using sensitive ports')
@@ -51,12 +57,16 @@ program
   .option('--timeout <ms>', 'Page load timeout in milliseconds', '15000')
   .option('--safe-report', 'Strip raw HTML snippets from rendered reports')
   .option('--max-field-length <chars>', 'Maximum report field length before truncation', '5000')
+  .option('--report-url <url>', 'Link to the full report, shown by the github format')
   .option('--progress', 'Show progress indicator for multi-page scans')
-  .option('--include-tags <tags>', 'Comma-separated axe tag names to include (e.g. wcag2a,wcag2aa)', (val) =>
-    val
-      .split(',')
-      .map((s) => s.trim())
-      .filter(Boolean)
+  .option(
+    '--include-tags <tags>',
+    'Comma-separated axe tag names to include (e.g. wcag2a,wcag2aa)',
+    (val) =>
+      val
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean)
   )
   .option('--exclude-rules <rules>', 'Comma-separated axe rule IDs to exclude', (val) =>
     val
@@ -64,6 +74,11 @@ program
       .map((s) => s.trim())
       .filter(Boolean)
   )
+  .option(
+    '--baseline <file>',
+    'Known issues file: only issues missing from it count as new and can fail the run'
+  )
+  .option('--write-baseline <file>', 'Write the issues found by this scan to a baseline file')
   .action(async (target, options) => {
     const mode = options.mode ?? 'balanced';
     if (!isScanMode(mode)) {
@@ -82,11 +97,15 @@ program
       process.exit(1);
     }
     if (isNaN(maxRedirects) || maxRedirects < 0) {
-      process.stderr.write(`Error: --max-redirects must be a non-negative number, got: ${options.maxRedirects}\n`);
+      process.stderr.write(
+        `Error: --max-redirects must be a non-negative number, got: ${options.maxRedirects}\n`
+      );
       process.exit(1);
     }
     if (isNaN(maxFieldLength) || maxFieldLength <= 0) {
-      process.stderr.write(`Error: --max-field-length must be a positive number, got: ${options.maxFieldLength}\n`);
+      process.stderr.write(
+        `Error: --max-field-length must be a positive number, got: ${options.maxFieldLength}\n`
+      );
       process.exit(1);
     }
     if (paranoidMode && options.allowUnsafeTargets) {
@@ -99,7 +118,15 @@ program
           if (current === total) process.stdout.write('\n');
         }
       : undefined;
-    const result = await scanTarget(target, {
+    let baseline;
+    if (options.baseline) {
+      try {
+        baseline = parseBaseline(await readFile(path.resolve(options.baseline), 'utf8'));
+      } catch (err) {
+        exitWithError(`could not read baseline ${options.baseline}: ${err.message}`);
+      }
+    }
+    const scanResult = await scanTarget(target, {
       mode,
       allowUnsafeTargets: paranoidMode ? false : options.allowUnsafeTargets,
       allowedDomains: options.allowedDomains,
@@ -111,10 +138,18 @@ program
       includeTags: options.includeTags,
       excludeRules: options.excludeRules
     });
+    const result = baseline ? applyBaseline(scanResult, baseline) : scanResult;
+    if (options.writeBaseline) {
+      await writeOutput(
+        options.writeBaseline,
+        JSON.stringify(createBaseline(scanResult), null, 2) + '\n'
+      );
+    }
     const format = options.outputFormat ?? options.format;
     const rendered = renderByFormat(result, format, {
       safeReport: paranoidMode ? true : options.safeReport,
-      maxFieldLength
+      maxFieldLength,
+      reportUrl: options.reportUrl
     });
 
     if (options.output) {
@@ -132,11 +167,12 @@ program
   .command('report')
   .description('Generate a report from a previous scan JSON output')
   .option('-i, --input <path>', 'Input JSON file path (required)')
-  .option('-f, --format <format>', 'Output format: terminal|json|html|markdown', 'html')
+  .option('-f, --format <format>', 'Output format: terminal|json|html|markdown|github', 'html')
   .option('--output-format <format>', 'Alias for --format')
   .option('-o, --output <path>', 'Output file path')
   .option('--safe-report', 'Strip raw HTML snippets from rendered reports')
   .option('--max-field-length <chars>', 'Maximum report field length before truncation', '5000')
+  .option('--report-url <url>', 'Link to the full report, shown by the github format')
   .action(async (options) => {
     if (!options.input) {
       process.stderr.write('Error: --input is required\n');
@@ -152,12 +188,15 @@ program
     const format = options.outputFormat ?? options.format;
     const maxFieldLength = parseInt(options.maxFieldLength, 10);
     if (isNaN(maxFieldLength) || maxFieldLength <= 0) {
-      process.stderr.write(`Error: --max-field-length must be a positive number, got: ${options.maxFieldLength}\n`);
+      process.stderr.write(
+        `Error: --max-field-length must be a positive number, got: ${options.maxFieldLength}\n`
+      );
       process.exit(1);
     }
     const rendered = renderByFormat(result, format, {
       safeReport: options.safeReport,
-      maxFieldLength
+      maxFieldLength,
+      reportUrl: options.reportUrl
     });
 
     if (options.output) {
@@ -169,7 +208,9 @@ program
 
 program
   .command('install-browser')
-  .description('Download the Chromium build used for scans (matches the bundled Playwright version)')
+  .description(
+    'Download the Chromium build used for scans (matches the bundled Playwright version)'
+  )
   .option('--with-deps', 'Also install system dependencies (Linux, requires root)')
   .action(async (options) => {
     const code = await installChromium({ withDeps: options.withDeps === true });

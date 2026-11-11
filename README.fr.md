@@ -157,6 +157,42 @@ npx astro-a11y report --input reports/report.json --format html --output reports
 
 Un seuil explicite l'emporte toujours : `--fail-on <sévérité>` (CLI) ou `failOn` (intégration), avec `critical`, `major`, `minor` ou `info`. Un mode ou un seuil invalide est refusé avec une erreur au lieu d'être ignoré en silence.
 
+## Baseline : adopter l'outil sur un site existant
+
+Enregistrez une fois les problèmes actuels, puis n'échouez que sur les nouveaux :
+
+```bash
+astro-a11y check ./dist --write-baseline a11y-baseline.json   # fichier à versionner
+astro-a11y check ./dist --mode strict --baseline a11y-baseline.json
+```
+
+Avec une baseline, les rapports signalent les nouveaux problèmes et comptent les éléments corrigés depuis, et le seuil d'échec ne compte que les nouveaux problèmes. L'intégration Astro accepte le même fichier : `astroA11y({ mode: 'strict', baseline: 'a11y-baseline.json' })` (chemin relatif à la racine du projet).
+
+Un problème est identifié par la règle axe, le chemin de la page et le sélecteur CSS de l'élément. Si le code autour d'un élément change, son sélecteur peut changer aussi : il apparaît alors comme corrigé + nouveau.
+
+## GitHub Action
+
+Analyse un build, publie (et met à jour) un seul commentaire sur la pull request, remplit le résumé du job et joint les rapports HTML/JSON/Markdown :
+
+```yaml
+jobs:
+  a11y:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write # pour commenter la pull request
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci && npm run build
+      - uses: Stan69000/astro-a11y@main # épinglez un tag de version ou un SHA
+        with:
+          target: dist
+          mode: strict
+          baseline: a11y-baseline.json
+```
+
+Entrées : `target`, `mode`, `fail-on`, `baseline`, `include-tags`, `exclude-rules`, `allowed-domains`, `comment`, `upload-report`, `artifact-name`, `github-token`. Sorties : `report-dir`, `new-issues`, `exit-code`. Sur une pull request venant d'un fork, le jeton est en lecture seule : le commentaire est ignoré avec un avertissement, et le résumé du job contient quand même le rapport.
+
 ## CLI
 
 ```bash
@@ -170,6 +206,7 @@ Exemples :
 ```bash
 astro-a11y check ./dist --mode balanced
 astro-a11y check ./dist --fail-on critical
+astro-a11y check ./dist --baseline a11y-baseline.json --format github --output comment.md
 astro-a11y check https://example.com --mode paranoid --allowed-domains example.com
 astro-a11y check https://example.com --format json --output reports/report.json
 astro-a11y report --input reports/report.json --format html --output reports/report.html --safe-report
@@ -208,6 +245,7 @@ Toutes les pages pré-rendues sont analysées, y compris celles générées par 
 | `excludeRules` | — | Règles axe à ignorer |
 | `timeout` | `15000` | Délai de chargement d'une page (ms) |
 | `showProgress` | `false` | Affiche chaque page analysée |
+| `baseline` | — | Fichier de baseline, relatif à la racine du projet |
 
 ## Porté par Le Singe du Numérique
 

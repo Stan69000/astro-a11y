@@ -1,0 +1,152 @@
+name: astro-a11y
+description: Scan a built site with axe-core, map issues to RGAA 4.1, comment on the pull request and fail only on new issues.
+author: Stan Bouchet
+branding:
+  icon: eye
+  color: blue
+
+inputs:
+  target:
+    description: Build directory (relative to the workspace) or URL to scan.
+    required: true
+  mode:
+    description: strict | balanced | learning | paranoid
+    default: balanced
+  fail-on:
+    description: Fail when issues at or above this severity are found (critical | major | minor | info). Empty = mode default.
+    default: ''
+  baseline:
+    description: Baseline file (relative to the workspace). Only issues missing from it count as new and can fail the job.
+    default: ''
+  include-tags:
+    description: Comma-separated axe tags to run, e.g. wcag2a,wcag2aa.
+    default: ''
+  exclude-rules:
+    description: Comma-separated axe rule IDs to skip.
+    default: ''
+  allowed-domains:
+    description: Comma-separated domain allowlist for URL targets.
+    default: ''
+  comment:
+    description: 'Post or update a comment on the pull request (needs the pull-requests: write permission).'
+    default: 'true'
+  upload-report:
+    description: Upload the HTML, JSON and Markdown reports as a workflow artifact.
+    default: 'true'
+  artifact-name:
+    description: Name of the uploaded artifact.
+    default: astro-a11y-report
+  github-token:
+    description: Token used to comment on the pull request.
+    default: ${{ github.token }}
+
+outputs:
+  report-dir:
+    description: Directory containing report.json, report.html, report.md and comment.md.
+    value: ${{ steps.scan.outputs.report-dir }}
+  new-issues:
+    description: Number of new issues (all issues when no baseline is given).
+    value: ${{ steps.scan.outputs.new-issues }}
+  exit-code:
+    description: Exit code of the scan (1 when the failure threshold was reached).
+    value: ${{ steps.scan.outputs.exit-code }}
+
+runs:
+  using: composite
+  steps:
+    - name: Install astro-a11y
+      shell: bash
+      working-directory: ${{ github.action_path }}
+      env:
+        HUSKY: '0'
+      run: |
+        node -e "const [major] = process.versions.node.split('.').map(Number); if (major < 20) { console.error('astro-a11y needs Node.js 20 or later, found ' + process.version); process.exit(1); }"
+        corepack pnpm install --frozen-lockfile
+        corepack pnpm build
+        node packages/cli/dist/bin.js install-browser --with-deps
+
+    - name: Scan
+      id: scan
+      shell: bash
+      working-directory: ${{ github.workspace }}
+      env:
+        CLI: ${{ github.action_path }}/packages/cli/dist/bin.js
+        A11Y_TARGET: ${{ inputs.target }}
+        A11Y_MODE: ${{ inputs.mode }}
+        A11Y_FAIL_ON: ${{ inputs.fail-on }}
+        A11Y_BASELINE: ${{ inputs.baseline }}
+        A11Y_INCLUDE_TAGS: ${{ inputs.include-tags }}
+        A11Y_EXCLUDE_RULES: ${{ inputs.exclude-rules }}
+        A11Y_ALLOWED_DOMAINS: ${{ inputs.allowed-domains }}
+        REPORT_DIR: astro-a11y-report
+      run: |
+        args=(check "$A11Y_TARGET" --mode "$A11Y_MODE" --format json --output "$REPORT_DIR/report.json")
+        [ -n "$A11Y_FAIL_ON" ] && args+=(--fail-on "$A11Y_FAIL_ON")
+        [ -n "$A11Y_BASELINE" ] && args+=(--baseline "$A11Y_BASELINE")
+        [ -n "$A11Y_INCLUDE_TAGS" ] && args+=(--include-tags "$A11Y_INCLUDE_TAGS")
+        [ -n "$A11Y_EXCLUDE_RULES" ] && args+=(--exclude-rules "$A11Y_EXCLUDE_RULES")
+        [ -n "$A11Y_ALLOWED_DOMAINS" ] && args+=(--allowed-domains "$A11Y_ALLOWED_DOMAINS")
+
+        set +e
+        node "$CLI" "${args[@]}"
+        exit_code=$?
+        set -e
+        if [ ! -f "$REPORT_DIR/report.json" ]; then
+          echo "::error::astro-a11y did not produce a report (exit code $exit_code)."
+          exit "$exit_code"
+        fi
+
+        run_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+        for format in html:report.html markdown:report.md github:comment.md; do
+          node "$CLI" report --input "$REPORT_DIR/report.json" --format "${format%%:*}" \
+            --output "$REPORT_DIR/${format#*:}" --report-url "$run_url"
+        done
+        cat "$REPORT_DIR/comment.md" >> "$GITHUB_STEP_SUMMARY"
+
+        new_issues=$(node -e "
+          const { summary } = JSON.parse(require('fs').readFileSync(process.argv[1], 'utf8'));
+          const counts = summary.newIssuesBySeverity ?? summary.issuesBySeverity;
+          console.log(Object.values(counts).reduce((sum, n) => sum + n, 0));
+        " "$REPORT_DIR/report.json")
+        {
+          echo "report-dir=$REPORT_DIR"
+          echo "new-issues=$new_issues"
+          echo "exit-code=$exit_code"
+        } >> "$GITHUB_OUTPUT"
+
+    - name: Comment on the pull request
+      if: inputs.comment == 'true' && github.event_name == 'pull_request'
+      shell: bash
+      working-directory: ${{ github.workspace }}
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+        COMMENT_FILE: astro-a11y-report/comment.md
+      run: |
+        marker='<!-- astro-a11y-report -->'
+        existing=$(gh api "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" --paginate \
+          --jq "[.[] | select(.body | startswith(\"$marker\"))][0].id // empty" 2>/dev/null | head -n 1) || existing=''
+        if [ -n "$existing" ]; then
+          gh api --method PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$existing" -F "body=@$COMMENT_FILE" >/dev/null \
+            || echo "::warning::astro-a11y could not update the pull request comment (missing pull-requests: write?)."
+        else
+          gh api --method POST "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" -F "body=@$COMMENT_FILE" >/dev/null \
+            || echo "::warning::astro-a11y could not comment on the pull request (missing pull-requests: write, or a fork)."
+        fi
+
+    - name: Upload reports
+      if: inputs.upload-report == 'true'
+      uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: ${{ github.workspace }}/astro-a11y-report
+        retention-days: 14
+
+    - name: Apply the failure threshold
+      if: steps.scan.outputs.exit-code != '0'
+      shell: bash
+      env:
+        EXIT_CODE: ${{ steps.scan.outputs.exit-code }}
+      run: |
+        echo "::error::astro-a11y found accessibility issues at or above the failure threshold."
+        exit "$EXIT_CODE"
