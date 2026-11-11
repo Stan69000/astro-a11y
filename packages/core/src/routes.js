@@ -1,3 +1,4 @@
+import { Buffer } from 'node:buffer';
 import { open, readdir } from 'node:fs/promises';
 import path from 'node:path';
 
