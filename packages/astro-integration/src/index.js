@@ -2,6 +2,8 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
+  SUPPORTED_LANGS,
+  isSupportedLang,
   applyBaseline,
   parseBaseline,
   scanDirectory,
@@ -17,7 +19,10 @@ import { resolveRoutesFromAssets, selectPrerenderedPages } from './routes.js';
 
 const REPORT_EXTENSIONS = { json: 'json', html: 'html', markdown: 'md' };
 
-function validateOptions({ mode, failOn, outputDirName, reportFormats }) {
+function validateOptions({ mode, failOn, lang, outputDirName, reportFormats }) {
+  if (!isSupportedLang(lang)) {
+    throw new Error(`[astro-a11y] lang must be one of ${SUPPORTED_LANGS.join(', ')}, got: ${lang}`);
+  }
   if (!isScanMode(mode)) {
     throw new Error(`[astro-a11y] mode must be one of ${SCAN_MODES.join(', ')}, got: ${mode}`);
   }
@@ -51,8 +56,9 @@ export default function astroA11y(options = {}) {
   const excludeRules = options.excludeRules;
   const baselinePath = options.baseline;
   const keyboard = options.keyboard ?? true;
+  const lang = options.lang ?? 'en';
 
-  validateOptions({ mode, failOn, outputDirName, reportFormats });
+  validateOptions({ mode, failOn, lang, outputDirName, reportFormats });
   const failThreshold = resolveFailThreshold({ mode, failOn, failByDefault: failOnBuild });
 
   let prerenderedPages = [];
@@ -94,7 +100,8 @@ export default function astroA11y(options = {}) {
           onProgress,
           includeTags,
           excludeRules,
-          keyboard
+          keyboard,
+          lang
         });
         const result = baseline ? applyBaseline(scanResult, baseline) : scanResult;
 

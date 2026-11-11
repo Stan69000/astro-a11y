@@ -1,3 +1,4 @@
+import { labels, severityLabel } from './i18n.js';
 import { escapeMd } from './markdown.js';
 
 /** Hidden marker used to find and update the previous comment on a pull request. */
@@ -23,6 +24,8 @@ function byPriority(a, b) {
   return (SEVERITY_RANK[a.severity] ?? 9) - (SEVERITY_RANK[b.severity] ?? 9);
 }
 
+const capitalize = (text) => text.replace(/^./, (c) => c.toUpperCase());
+
 /**
  * Compact Markdown for a pull request comment or a job summary.
  *
@@ -30,68 +33,75 @@ function byPriority(a, b) {
  * @param {{ reportUrl?: string }} [options] Link to the full report (e.g. the workflow run).
  */
 export function renderGithubComment(result, options = {}) {
+  const t = labels(result.lang);
   const { summary } = result;
   const counts = summary.issuesBySeverity;
   const hasBaseline = Boolean(summary.newIssuesBySeverity);
-  const lines = [GITHUB_COMMENT_MARKER, '## astro-a11y accessibility report', ''];
+  const lines = [GITHUB_COMMENT_MARKER, `## ${t.commentTitle}`, ''];
 
-  lines.push('| Pages scanned | Critical | Major | Minor | Info |');
+  const severities = ['critical', 'major', 'minor', 'info'];
+  lines.push(
+    `| ${t.pagesScanned} | ${severities.map((s) => capitalize(severityLabel(t, s))).join(' | ')} |`
+  );
   lines.push('|---:|---:|---:|---:|---:|');
   lines.push(
-    `| ${summary.pagesScanned} | ${counts.critical} | ${counts.major} | ${counts.minor} | ${counts.info} |`
+    `| ${Number(summary.pagesScanned)} | ${severities.map((s) => Number(counts[s])).join(' | ')} |`
   );
   lines.push('');
 
   if (hasBaseline) {
     const fresh = summary.newIssuesBySeverity;
     const totalNew = Object.values(fresh).reduce((sum, count) => sum + count, 0);
-    lines.push(
-      totalNew === 0
-        ? '**No new issue** compared with the baseline.'
-        : `**${totalNew} new issue(s)** compared with the baseline: critical ${fresh.critical}, major ${fresh.major}, minor ${fresh.minor}, info ${fresh.info}.`
-    );
+    lines.push(totalNew === 0 ? t.noNewIssue : t.newIssues(totalNew, fresh));
     if (summary.baseline?.fixedElements > 0) {
-      lines.push(`${summary.baseline.fixedElements} known element(s) fixed since the baseline.`);
+      lines.push(t.knownFixed(summary.baseline.fixedElements));
     }
     lines.push('');
   }
 
   if (result.pageErrors?.length) {
-    lines.push(`**${result.pageErrors.length} page(s) could not be scanned:** see the full report.`, '');
+    lines.push(t.pagesNotScannedCount(result.pageErrors.length), '');
+  }
+
+  const failedCriteria = (result.criteria ?? []).filter((line) => line.outcome === 'failed');
+  if (failedCriteria.length > 0) {
+    lines.push(
+      t.failedCriteria(failedCriteria.map((line) => escapeMd(line.criterion)).join(', ')),
+      ''
+    );
   }
 
   const issues = [...result.issues].sort(byPriority);
   if (issues.length === 0) {
-    lines.push('No accessibility issues detected by the configured automated checks.');
+    lines.push(t.noIssues);
   } else {
-    const header = hasBaseline
-      ? ['| | Severity | RGAA | Rule | Page | Issue |', '|---|---|---|---|---|---|']
-      : ['| Severity | RGAA | Rule | Page | Issue |', '|---|---|---|---|---|'];
-    lines.push(...header);
+    const columns = [t.severity, 'RGAA', t.rule, t.page, t.title];
+    if (hasBaseline) columns.unshift('');
+    lines.push(`| ${columns.join(' | ')} |`, `|${columns.map(() => '---').join('|')}|`);
     for (const issue of issues.slice(0, MAX_ROWS)) {
       const cells = [
-        escapeMd(issue.severity),
+        escapeMd(severityLabel(t, issue.severity)),
         escapeMd(issue.rgaa),
         `\`${String(issue.id).replace(/`/g, '')}\``,
         escapeMd(pagePath(issue.page)),
         escapeMd(issue.title)
       ];
-      if (hasBaseline) cells.unshift(issue.isNew ? '**new**' : '');
+      if (hasBaseline) cells.unshift(issue.isNew ? `**${t.newIssue}**` : '');
       lines.push(`| ${cells.join(' | ')} |`);
     }
     if (issues.length > MAX_ROWS) {
-      lines.push('', `…and ${issues.length - MAX_ROWS} more.`);
+      lines.push('', t.more(issues.length - MAX_ROWS));
     }
   }
 
   lines.push('');
   lines.push(
-    options.reportUrl
-      ? `Full HTML, JSON and Markdown reports: [workflow run](${options.reportUrl}).`
-      : 'Automated checks only: they do not replace a manual RGAA audit.'
+    /^https?:\/\//i.test(options.reportUrl ?? '')
+      ? t.fullReport(options.reportUrl)
+      : t.automatedOnly
   );
 
   const body = lines.join('\n');
   if (body.length <= MAX_COMMENT_LENGTH) return body;
-  return `${body.slice(0, MAX_COMMENT_LENGTH)}\n\n…comment truncated, see the full report.`;
+  return `${body.slice(0, MAX_COMMENT_LENGTH)}\n\n${t.truncated}`;
 }

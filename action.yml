@@ -33,6 +33,9 @@ inputs:
   max-pages:
     description: Maximum number of pages scanned from the sitemaps.
     default: '50'
+  lang:
+    description: 'Language of issue texts and reports: en or fr.'
+    default: en
   keyboard:
     description: "'false' to skip the keyboard checks (focus visibility, keyboard traps, skip link)."
     default: 'true'
@@ -90,9 +93,10 @@ runs:
         A11Y_SITEMAP: ${{ inputs.sitemap }}
         A11Y_MAX_PAGES: ${{ inputs.max-pages }}
         A11Y_KEYBOARD: ${{ inputs.keyboard }}
+        A11Y_LANG: ${{ inputs.lang }}
         REPORT_DIR: astro-a11y-report
       run: |
-        args=(check "$A11Y_TARGET" --mode "$A11Y_MODE" --format json --output "$REPORT_DIR/report.json")
+        args=(check "$A11Y_TARGET" --mode "$A11Y_MODE" --lang "$A11Y_LANG" --format json --output "$REPORT_DIR/report.json")
         [ -n "$A11Y_FAIL_ON" ] && args+=(--fail-on "$A11Y_FAIL_ON")
         [ -n "$A11Y_BASELINE" ] && args+=(--baseline "$A11Y_BASELINE")
         [ -n "$A11Y_INCLUDE_TAGS" ] && args+=(--include-tags "$A11Y_INCLUDE_TAGS")

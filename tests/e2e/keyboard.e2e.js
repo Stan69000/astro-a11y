@@ -26,7 +26,8 @@ async function check(fixture) {
   try {
     const url = new URL(fixture, server.baseUrl).toString();
     await page.goto(url);
-    return await runKeyboardChecks(page, url, 'balanced');
+    const { issues } = await runKeyboardChecks(page, url, 'balanced');
+    return issues;
   } finally {
     await page.close();
   }
@@ -70,4 +71,22 @@ test('detects a skip link cancelled by JavaScript', async () => {
 
 test('focus moving inside an iframe is not a trap', async () => {
   assert.deepEqual(ids(await check('iframe.html')), []);
+});
+
+test('reports outcomes per rule and French texts', async () => {
+  const page = await browser.newPage();
+  try {
+    const url = new URL('broken-skip.html', server.baseUrl).toString();
+    await page.goto(url);
+    const { issues, outcomes } = await runKeyboardChecks(page, url, 'learning', { lang: 'fr' });
+    assert.deepEqual(outcomes, {
+      'keyboard-trap': 'passed',
+      'keyboard-focus-visible': 'passed',
+      'keyboard-skip-link': 'failed'
+    });
+    assert.equal(issues[0].title, 'Lien d’évitement inopérant');
+    assert.match(issues[0].nodes[0].failureSummary, /Aucun élément avec l’id « contenu »/);
+  } finally {
+    await page.close();
+  }
 });

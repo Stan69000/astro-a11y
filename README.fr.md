@@ -157,6 +157,14 @@ npx astro-a11y report --input reports/report.json --format html --output reports
 
 Un seuil explicite l'emporte toujours : `--fail-on <sévérité>` (CLI) ou `failOn` (intégration), avec `critical`, `major`, `minor` ou `info`. Un mode ou un seuil invalide est refusé avec une erreur au lieu d'être ignoré en silence.
 
+## Couverture RGAA et rapports en français
+
+87 règles axe-core sont reliées à des critères RGAA 4.1.2 (en plus des 3 tests clavier), chacune avec une explication et une correction en anglais et en français. Les règles sans équivalent RGAA clair (AAA, WCAG 2.2, informatives) sont signalées en `manual-check` avec la sévérité d'axe.
+
+`--lang fr` (CLI), `lang: 'fr'` (intégration) ou `lang: fr` (Action) écrivent les problèmes et les rapports en français.
+
+Chaque rapport se termine par une **vue par critère** : pour chaque critère concerné par les règles exécutées, *Problèmes détectés*, *À vérifier à la main* (axe n'a pas pu trancher), *Aucun problème détecté* ou *Non applicable*. *Aucun problème détecté* veut seulement dire que les tests automatiques n'ont rien trouvé : la plupart des critères demandent aussi une vérification humaine.
+
 ## Tests clavier
 
 En plus d'axe-core, chaque page est parcourue avec la touche Tab (désactivable avec `--no-keyboard` ou `keyboard: false`) :
@@ -208,7 +216,7 @@ Entrées : `target`, `mode`, `fail-on`, `baseline`, `include-tags`, `exclude-rul
 ## CLI
 
 ```bash
-astro-a11y check <target> [--mode strict|balanced|learning|paranoid] [--format terminal|json|html|markdown|github] [--fail-on critical|major|minor|info] [--baseline <file>] [--sitemap [url]]
+astro-a11y check <target> [--mode strict|balanced|learning|paranoid] [--format terminal|json|html|markdown|github] [--fail-on critical|major|minor|info] [--baseline <file>] [--sitemap [url]] [--lang en|fr] [--no-keyboard]
 astro-a11y report --input ./reports/report.json [--format terminal|json|html|markdown] [--safe-report]
 astro-a11y install-browser [--with-deps]
 ```
@@ -268,6 +276,7 @@ Toutes les pages pré-rendues sont analysées, y compris celles générées par 
 | `showProgress` | `false` | Affiche chaque page analysée |
 | `baseline` | — | Fichier de baseline, relatif à la racine du projet |
 | `keyboard` | `true` | Lance les tests clavier |
+| `lang` | `'en'` | Langue des problèmes et des rapports (`en`, `fr`) |
 
 ## Porté par Le Singe du Numérique
 

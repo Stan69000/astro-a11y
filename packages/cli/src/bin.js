@@ -3,6 +3,8 @@ import { Command } from 'commander';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import {
+  SUPPORTED_LANGS,
+  isSupportedLang,
   applyBaseline,
   createBaseline,
   installChromium,
@@ -84,6 +86,7 @@ program
     'For a URL target: scan the pages listed in the site sitemaps (robots.txt, /sitemap-index.xml, /sitemap.xml) or in the given sitemap'
   )
   .option('--max-pages <count>', 'Maximum number of pages scanned with --sitemap', '50')
+  .option('--lang <lang>', 'Language of issue texts and reports: en|fr', 'en')
   .option('--no-keyboard', 'Skip the keyboard checks (focus visibility, keyboard traps, skip link)')
   .action(async (target, options) => {
     const mode = options.mode ?? 'balanced';
@@ -124,6 +127,9 @@ program
           if (current === total) process.stdout.write('\n');
         }
       : undefined;
+    if (!isSupportedLang(options.lang)) {
+      exitWithError(`--lang must be one of ${SUPPORTED_LANGS.join('|')}, got: ${options.lang}`);
+    }
     const maxPages = parseInt(options.maxPages, 10);
     if (isNaN(maxPages) || maxPages <= 0) {
       exitWithError(`--max-pages must be a positive number, got: ${options.maxPages}`);
@@ -153,6 +159,7 @@ program
       includeTags: options.includeTags,
       excludeRules: options.excludeRules,
       keyboard: options.keyboard,
+      lang: options.lang,
       sitemap: Boolean(options.sitemap),
       sitemapUrl: typeof options.sitemap === 'string' ? options.sitemap : undefined,
       maxPages

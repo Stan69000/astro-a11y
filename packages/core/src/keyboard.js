@@ -19,37 +19,81 @@ export const KEYBOARD_RULES = Object.freeze({
   'keyboard-trap': {
     rgaa: '12.9',
     severity: 'critical',
-    title: 'Keyboard trap',
-    why: 'Keyboard users get stuck: pressing Tab never reaches the rest of the page.',
-    howToFix:
-      'Let Tab and Shift+Tab leave the component. For modal dialogs, trap focus only while the dialog is open and close it with Escape.',
-    help: 'Focus must be able to move away from every element with the Tab key.'
+    en: {
+      title: 'Keyboard trap',
+      why: 'Keyboard users get stuck: pressing Tab never reaches the rest of the page.',
+      howToFix:
+        'Let Tab and Shift+Tab leave the component. For modal dialogs, trap focus only while the dialog is open and close it with Escape.',
+      help: 'Focus must be able to move away from every element with the Tab key.'
+    },
+    fr: {
+      title: 'Piège au clavier',
+      why: 'Au clavier, on reste bloqué : la touche Tab n’atteint jamais le reste de la page.',
+      howToFix:
+        'Laisser Tab et Maj+Tab sortir du composant. Pour une fenêtre modale, ne retenir le focus que pendant qu’elle est ouverte, et la fermer avec Échap.',
+      help: 'Le focus doit toujours pouvoir quitter un élément avec la touche Tab.'
+    }
   },
   'keyboard-focus-visible': {
     rgaa: '10.7',
     severity: 'minor',
-    title: 'Keyboard focus is not visible',
-    why: 'Sighted keyboard users cannot see which element they are on.',
-    howToFix:
-      'Do not remove the browser outline without a replacement: add a :focus-visible style (outline, border or background change) with enough contrast. Check the result manually.',
+    en: {
+      title: 'Keyboard focus is not visible',
+      why: 'Sighted keyboard users cannot see which element they are on.',
+      howToFix:
+        'Do not remove the browser outline without a replacement: add a :focus-visible style (outline, border or background change) with enough contrast. Check the result manually.',
+      help: 'Every element that receives keyboard focus must show a visible focus indicator.'
+    },
+    fr: {
+      title: 'Focus clavier invisible',
+      why: 'En naviguant au clavier, on ne voit pas sur quel élément on se trouve.',
+      howToFix:
+        'Ne pas supprimer le contour du navigateur sans le remplacer : ajouter un style :focus-visible (contour, bordure ou fond) bien contrasté. Vérifier le résultat à l’œil.',
+      help: 'Chaque élément qui reçoit le focus clavier doit le montrer visiblement.'
+    },
     before: 'a:focus { outline: none; }',
-    after: 'a:focus-visible { outline: 3px solid #1d4ed8; outline-offset: 2px; }',
-    help: 'Every element that receives keyboard focus must show a visible focus indicator.'
+    after: 'a:focus-visible { outline: 3px solid #1d4ed8; outline-offset: 2px; }'
   },
   'keyboard-skip-link': {
     rgaa: '12.7',
     severity: 'major',
-    title: 'Skip link does not work',
-    why: 'Keyboard users must go through every navigation link again to reach the content.',
-    howToFix:
-      'Point the skip link to the id of the main content (e.g. href="#main" and <main id="main" tabindex="-1">) and do not cancel the link with JavaScript.',
+    en: {
+      title: 'Skip link does not work',
+      why: 'Keyboard users must go through every navigation link again to reach the content.',
+      howToFix:
+        'Point the skip link to the id of the main content (e.g. href="#main" and <main id="main" tabindex="-1">) and do not cancel the link with JavaScript.',
+      help: 'A link at the top of the page must take keyboard navigation to the main content.'
+    },
+    fr: {
+      title: 'Lien d’évitement inopérant',
+      why: 'Au clavier, il faut retraverser tous les liens de navigation pour atteindre le contenu.',
+      howToFix:
+        'Faire pointer le lien vers l’id du contenu principal (href="#contenu" et <main id="contenu" tabindex="-1">) et ne pas l’annuler en JavaScript.',
+      help: 'Un lien en haut de page doit emmener la navigation clavier au contenu principal.'
+    },
     before: '<a href="#contenu">Aller au contenu</a> … <main>',
-    after: '<a href="#contenu">Aller au contenu</a> … <main id="contenu" tabindex="-1">',
-    help: 'A link at the top of the page must take keyboard navigation to the main content.'
+    after: '<a href="#contenu">Aller au contenu</a> … <main id="contenu" tabindex="-1">'
   }
 });
 
+const MESSAGES = {
+  en: {
+    trap: (count) =>
+      `Tab cycles between ${count} element(s) and never reaches the rest of the page.`,
+    invisible: 'No outline and no style change when the element receives keyboard focus.',
+    missingTarget: (id) => `No element with id "${id}".`,
+    notMoved: 'After activating the link, Tab does not continue from its target.'
+  },
+  fr: {
+    trap: (count) => `Tab tourne entre ${count} élément(s) sans atteindre le reste de la page.`,
+    invisible: 'Ni contour ni changement de style quand l’élément reçoit le focus clavier.',
+    missingTarget: (id) => `Aucun élément avec l’id « ${id} ».`,
+    notMoved: 'Après activation du lien, Tab ne repart pas de sa cible.'
+  }
+};
+
 const MAX_TABS = 60;
+const RULE_IDS = Object.keys(KEYBOARD_RULES);
 
 /** Runs inside the page: shared helpers, injected once per check. */
 const PAGE_HELPERS = `
@@ -109,19 +153,20 @@ const PAGE_HELPERS = `
   };
 `;
 
-function makeIssue(ruleId, page, mode, nodes) {
+function makeIssue(ruleId, page, mode, nodes, lang) {
   const rule = KEYBOARD_RULES[ruleId];
+  const text = rule[lang] ?? rule.en;
   return {
     id: ruleId,
     rgaa: rule.rgaa,
     rgaaTitle: criterionTitle(rule.rgaa),
     page,
     severity: rule.severity,
-    title: rule.title,
-    why: rule.why,
-    howToFix: rule.howToFix,
+    title: text.title,
+    why: text.why,
+    howToFix: text.howToFix,
     nodes,
-    help: rule.help,
+    help: text.help,
     helpUrl: `https://accessibilite.numerique.gouv.fr/methode/criteres-et-tests/#${rule.rgaa}`,
     mode,
     before: rule.before,
@@ -152,8 +197,11 @@ async function describe(handle) {
  * @param {import('playwright').Page} page
  * @param {string} url Page URL used in the issues.
  * @param {string} mode Scan mode recorded in the issues.
+ * @param {{ lang?: string }} [options]
+ * @returns {Promise<{ issues: object[], outcomes: Record<string, 'failed'|'passed'|'inapplicable'> }>}
  */
-export async function runKeyboardChecks(page, url, mode) {
+export async function runKeyboardChecks(page, url, mode, { lang = 'en' } = {}) {
+  const messages = MESSAGES[lang] ?? MESSAGES.en;
   await page.evaluate(PAGE_HELPERS);
   // Transitions would make computed styles lag behind the focus change.
   // A strict Content-Security-Policy can refuse the style: the checks still run.
@@ -168,7 +216,9 @@ export async function runKeyboardChecks(page, url, mode) {
   });
 
   const tabbables = await page.evaluate(() => window.__astroA11yKeyboard.tabbableCount());
-  if (tabbables === 0) return [];
+  if (tabbables === 0) {
+    return { issues: [], outcomes: Object.fromEntries(RULE_IDS.map((id) => [id, 'inapplicable'])) };
+  }
 
   const issues = [];
   const visited = []; // { handle, info, focusedStyle, outline }
@@ -210,8 +260,9 @@ export async function runKeyboardChecks(page, url, mode) {
         trap.map((info) => ({
           target: info.target,
           html: info.html,
-          failureSummary: `Tab cycles between ${trap.length} element(s) and never reaches the rest of the page.`
-        }))
+          failureSummary: messages.trap(trap.length)
+        })),
+        lang
       )
     );
   }
@@ -234,26 +285,40 @@ export async function runKeyboardChecks(page, url, mode) {
         invisible.map((info) => ({
           target: info.target,
           html: info.html,
-          failureSummary: 'No outline and no style change when the element receives keyboard focus.'
-        }))
+          failureSummary: messages.invisible
+        })),
+        lang
       )
     );
   }
 
-  const skipLinkProblem = visited[0] ? await checkSkipLink(page, visited[0].handle) : null;
-  if (skipLinkProblem) {
-    issues.push(makeIssue('keyboard-skip-link', url, mode, [skipLinkProblem]));
+  const skipLink = visited[0]
+    ? await checkSkipLink(page, visited[0].handle, messages)
+    : { applicable: false, problem: null };
+  if (skipLink.problem) {
+    issues.push(makeIssue('keyboard-skip-link', url, mode, [skipLink.problem], lang));
   }
 
   await Promise.all(visited.map((entry) => entry.handle.dispose()));
-  return issues;
+  return {
+    issues,
+    outcomes: {
+      'keyboard-trap': trap ? 'failed' : 'passed',
+      'keyboard-focus-visible': invisible.length > 0 ? 'failed' : 'passed',
+      'keyboard-skip-link': !skipLink.applicable
+        ? 'inapplicable'
+        : skipLink.problem
+          ? 'failed'
+          : 'passed'
+    }
+  };
 }
 
 /**
  * When the first focusable element is an in-page link, checks that its target
  * exists and that activating it moves keyboard navigation there.
  */
-async function checkSkipLink(page, firstHandle) {
+async function checkSkipLink(page, firstHandle, messages) {
   const link = await firstHandle.evaluate((el) => {
     const href = el.localName === 'a' ? el.getAttribute('href') : null;
     if (!href || !href.startsWith('#') || href.length < 2) return null;
@@ -271,12 +336,15 @@ async function checkSkipLink(page, firstHandle) {
       hasTarget: Boolean(target)
     };
   });
-  if (!link) return null;
+  if (!link) return { applicable: false, problem: null };
   if (!link.hasTarget) {
     return {
-      target: link.target,
-      html: link.html,
-      failureSummary: `No element with id "${link.href.slice(1)}".`
+      applicable: true,
+      problem: {
+        target: link.target,
+        html: link.html,
+        failureSummary: messages.missingTarget(link.href.slice(1))
+      }
     };
   }
 
@@ -293,7 +361,7 @@ async function checkSkipLink(page, firstHandle) {
     if (active && active !== document.body && onTarget(active)) return true;
     return null; // Decide after the next Tab.
   }, link.href);
-  if (reached) return null;
+  if (reached) return { applicable: true, problem: null };
 
   const next = await pressTab(page);
   const afterTarget = await next.evaluate((el, href) => {
@@ -307,10 +375,9 @@ async function checkSkipLink(page, firstHandle) {
     );
   }, link.href);
   await next.dispose();
-  if (afterTarget) return null;
+  if (afterTarget) return { applicable: true, problem: null };
   return {
-    target: link.target,
-    html: link.html,
-    failureSummary: 'After activating the link, Tab does not continue from its target.'
+    applicable: true,
+    problem: { target: link.target, html: link.html, failureSummary: messages.notMoved }
   };
 }

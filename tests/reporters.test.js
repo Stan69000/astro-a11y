@@ -110,3 +110,29 @@ test("renderByFormat strips raw html in safe-report mode", () => {
   assert.equal(parsed.issues[0].before, undefined);
   assert.equal(parsed.issues[0].nodes[0].html, undefined);
 });
+
+test("renderHtml and renderMarkdown render the criteria view in French", () => {
+  const result = {
+    ...mockResult,
+    lang: "fr",
+    rgaaVersion: "4.1.2",
+    criteria: [
+      { criterion: "1.1", title: "Chaque image porteuse d’information a-t-elle une alternative textuelle ?", topic: "Images", outcome: "failed", issues: 1, elements: 2 },
+      { criterion: "8.5", title: "Chaque page web a-t-elle un titre de page ?", topic: "Éléments obligatoires", outcome: "passed", issues: 0, elements: 0 }
+    ]
+  };
+  const html = renderHtml(result);
+  assert.match(html, /<html lang="fr">/);
+  assert.match(html, /Critères RGAA/);
+  assert.match(html, /Problèmes détectés/);
+  assert.match(html, /Aucun problème détecté/);
+  assert.match(html, /ne veut pas dire conforme/);
+  const markdown = renderMarkdown(result);
+  assert.match(markdown, /^# Rapport astro-a11y/);
+  assert.match(markdown, /\| \*\*8\.5\*\* Chaque page web a\\-t\\-elle un titre de page \? \| Éléments obligatoires \| Aucun problème détecté \|/);
+});
+
+test("renderHtml refuses non-http documentation links", () => {
+  const html = renderHtml({ ...mockResult, issues: [{ ...mockResult.issues[0], helpUrl: "javascript:alert(1)" }] });
+  assert.doesNotMatch(html, /javascript:/);
+});

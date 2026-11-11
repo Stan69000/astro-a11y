@@ -45,3 +45,38 @@ test('never maps to the data tables theme (5.x) for non-table rules', () => {
     assert.ok(!mapAxeToRgaa(ruleId).rgaa.startsWith('5.'), `${ruleId} is not a table rule`);
   }
 });
+
+test('every mapped rule has English and French texts', async () => {
+  const { AXE_RULES } = await import('../packages/core/src/axe-rules.js');
+  for (const [ruleId, rule] of Object.entries(AXE_RULES)) {
+    for (const lang of ['en', 'fr']) {
+      for (const field of ['title', 'why', 'howToFix']) {
+        assert.ok(rule[lang]?.[field]?.length > 5, `${ruleId}.${lang}.${field}`);
+      }
+    }
+  }
+});
+
+test('returns French texts on request and falls back to English for unknown languages', () => {
+  assert.equal(mapAxeToRgaa('image-alt', { lang: 'fr' }).title, 'Image sans alternative textuelle');
+  assert.equal(
+    mapAxeToRgaa('image-alt', { lang: 'de' }).title,
+    'Alternative text missing on image'
+  );
+});
+
+test('unmapped rules take their severity from the axe impact', () => {
+  assert.equal(mapAxeToRgaa('target-size', { impact: 'serious' }).severity, 'major');
+  assert.equal(mapAxeToRgaa('target-size', { impact: 'critical' }).severity, 'critical');
+  assert.equal(mapAxeToRgaa('target-size', { impact: 'moderate' }).severity, 'minor');
+  assert.equal(mapAxeToRgaa('target-size').severity, 'major');
+  assert.equal(
+    mapAxeToRgaa('target-size', { lang: 'fr' }).title,
+    'Problème d’accessibilité détecté'
+  );
+});
+
+test('does not treat inherited object keys as rules', () => {
+  assert.equal(mapAxeToRgaa('constructor').rgaa, 'manual-check');
+  assert.equal(mapAxeToRgaa('__proto__').rgaa, 'manual-check');
+});

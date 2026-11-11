@@ -64,6 +64,8 @@ export interface ScanOptions {
   timeout?: number;
   /** Run the keyboard checks (default: true). */
   keyboard?: boolean;
+  /** Language of issue texts: "en" (default) or "fr". */
+  lang?: "en" | "fr";
   onProgress?: (progress: ProgressInfo) => void;
 }
 
@@ -86,4 +88,5 @@ export interface AstroA11yOptions {
   showProgress?: boolean;
   keyboard?: boolean;
   baseline?: string;
+  lang?: "en" | "fr";
 }

@@ -5,7 +5,15 @@ export {
   isUnsafeHostname,
   resolveSafeRemoteUrl
 } from './security.js';
-export { enrichViolation, mapAxeToRgaa } from './mappings.js';
+export {
+  enrichViolation,
+  isSupportedLang,
+  mapAxeToRgaa,
+  MAPPED_AXE_RULES,
+  SUPPORTED_LANGS
+} from './mappings.js';
+export { AXE_RULES } from './axe-rules.js';
+export { buildCriteriaView, OUTCOME_ORDER } from './criteria.js';
 export {
   RGAA_CRITERIA,
   RGAA_TOPICS,
