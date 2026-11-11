@@ -164,10 +164,10 @@ En plus d'axe-core, chaque page est parcourue avec la touche Tab (désactivable 
 | Test | RGAA | Sévérité | Détecte |
 | --- | --- | --- | --- |
 | `keyboard-trap` | 12.9 | critical | Tab tourne en boucle sur quelques éléments sans jamais atteindre le reste de la page |
-| `focus-visible` | 10.7 | minor | Un élément reçoit le focus clavier sans contour ni changement de style |
-| `skip-link` | 12.7 | major | Le premier lien pointe vers une ancre absente, ou son activation ne déplace pas la navigation clavier vers sa cible |
+| `keyboard-focus-visible` | 10.7 | minor | Un élément reçoit le focus clavier sans contour ni changement de style |
+| `keyboard-skip-link` | 12.7 | major | Le premier lien pointe vers une ancre absente, ou son activation ne déplace pas la navigation clavier vers sa cible |
 
-`focus-visible` est `minor`, car un changement visible peut rester trop discret, et un indicateur dessiné par un script n'est pas détectable : à confirmer à la main. La cohérence de l'ordre de tabulation (RGAA 12.8) demande toujours un humain.
+`keyboard-focus-visible` est `minor`, car un changement visible peut rester trop discret, et un indicateur dessiné par un script n'est pas détectable : à confirmer à la main. La cohérence de l'ordre de tabulation (RGAA 12.8) demande toujours un humain.
 
 ## Baseline : adopter l'outil sur un site existant
 
