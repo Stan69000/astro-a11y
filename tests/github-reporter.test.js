@@ -55,9 +55,7 @@ test('lists new issues first and summarises the baseline', () => {
   const body = renderGithubComment(result);
   assert.match(body, /\*\*1 new issue\(s\)\*\*/);
   assert.match(body, /2 known element\(s\) fixed/);
-  const rows = body
-    .split('\n')
-    .filter((line) => line.startsWith('| **new**') || line.startsWith('|  |'));
+  const rows = body.split('\n').filter((line) => line.startsWith('|') && line.includes('`'));
   assert.ok(rows[0].includes('image-alt'), 'new issue comes first');
 });
 
@@ -75,4 +73,25 @@ test('caps the number of rows', () => {
   }));
   const body = renderGithubComment({ ...baseResult, issues });
   assert.match(body, /…and 10 more\./);
+});
+
+test('renders in French with the failed criteria', () => {
+  const body = renderGithubComment({
+    ...baseResult,
+    lang: 'fr',
+    criteria: [
+      { criterion: '1.1', outcome: 'failed' },
+      { criterion: '3.2', outcome: 'passed' },
+      { criterion: '11.1', outcome: 'failed' }
+    ]
+  });
+  assert.match(body, /## Rapport d’accessibilité astro-a11y/);
+  assert.match(body, /\| Pages analysées \| Critique \| Majeur \| Mineur \| Info \|/);
+  assert.match(body, /\*\*Critères RGAA en défaut :\*\* 1\.1, 11\.1\./);
+  assert.match(body, /\| majeur \| 1\.1 \|/);
+});
+
+test('never links to a non-http report URL', () => {
+  const body = renderGithubComment(baseResult, { reportUrl: 'javascript:alert(1)' });
+  assert.doesNotMatch(body, /javascript:/);
 });

@@ -7,7 +7,7 @@ import {
   criterionTitle,
   criterionTopic
 } from '../packages/core/src/rgaa.js';
-import { mapAxeToRgaa, enrichViolation } from '../packages/core/src/mappings.js';
+import { MAPPED_AXE_RULES, mapAxeToRgaa, enrichViolation } from '../packages/core/src/mappings.js';
 import { KEYBOARD_RULES } from '../packages/core/src/keyboard.js';
 
 test('shared reference: RGAA 4.1.2, 13 topics, 106 criteria', () => {
@@ -19,15 +19,9 @@ test('shared reference: RGAA 4.1.2, 13 topics, 106 criteria', () => {
   assert.equal(criterionTitle('99.9'), undefined);
 });
 
-test('every axe and keyboard rule points to an existing criterion', async () => {
-  const { readFile } = await import('node:fs/promises');
-  const source = await readFile(
-    new URL('../packages/core/src/mappings.js', import.meta.url),
-    'utf8'
-  );
-  const axeRules = Array.from(source.matchAll(/^ {2}'?([a-z-]+)'?: \{$/gm), (match) => match[1]);
-  assert.ok(axeRules.length >= 17);
-  for (const ruleId of axeRules) {
+test('every axe and keyboard rule points to an existing criterion', () => {
+  assert.ok(MAPPED_AXE_RULES.length >= 80);
+  for (const ruleId of MAPPED_AXE_RULES) {
     const { rgaa } = mapAxeToRgaa(ruleId);
     assert.ok(criterionTitle(rgaa), `${ruleId} → ${rgaa} is not an RGAA criterion`);
   }

@@ -6,6 +6,11 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- RGAA mapping extended from 17 to 87 axe-core rules (images, frames, colors, media, tables, links, ARIA, mandatory elements, structure, presentation, forms, navigation, consultation), each with English and French texts. Unmapped rules take their severity from axe's impact.
+- `--lang fr` / `lang: 'fr'` / Action `lang` input: issue texts and every report format in French.
+- Per-criterion view in every report (`criteria` in JSON): outcome of each RGAA criterion touched by the rules that ran (issues found, to check manually, no issue detected, not applicable), with counts and worst severity.
+- `rgaaVersion` and `lang` in scan results.
+
 - RGAA reference shared with rgaa-audit (RGAA 4.1.2, 13 topics, official titles of the 106 criteria): issues now carry `rgaaTitle`, `RGAA_VERSION` is `4.1.2`, a test checks that every mapped criterion exists, `scripts/sync-rgaa-reference.js` and a weekly drift check keep the copy identical to rgaa-audit's.
 
 - Keyboard checks with real key presses: keyboard trap (RGAA 12.9), invisible focus (RGAA 10.7), broken skip link (RGAA 12.7). On by default; `--no-keyboard`, `keyboard: false` or the Action's `keyboard` input turn them off. Real-browser tests in `pnpm test:e2e` and a CI job.

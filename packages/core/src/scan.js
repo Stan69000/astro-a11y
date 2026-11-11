@@ -4,9 +4,10 @@ import AxeBuilder from '@axe-core/playwright';
 import { assertAllowedRemoteTarget, resolveSafeRemoteUrl } from './security.js';
 import { collectHtmlRoutesFromDirectory } from './routes.js';
 import { startStaticServer } from './static-server.js';
-import { enrichViolation } from './mappings.js';
+import { enrichViolation, RGAA_VERSION } from './mappings.js';
 import { launchChromium } from './browser.js';
-import { runKeyboardChecks } from './keyboard.js';
+import { KEYBOARD_RULES, runKeyboardChecks } from './keyboard.js';
+import { buildCriteriaView, recordAxeOutcomes, recordOutcome } from './criteria.js';
 import { discoverSitemapUrls } from './sitemap.js';
 
 const DEFAULT_TIMEOUT_MS = 15000;
@@ -63,14 +64,36 @@ async function resolveDirectoryRoutes(rootDir, providedRoutes) {
   return collectHtmlRoutesFromDirectory(rootDir);
 }
 
-function pageContext(options, securityOptions) {
+/**
+ * @param {object} options Scan options.
+ * @param {object} securityOptions
+ * @param {Map<string, string>} ruleOutcomes Filled with the outcome of every rule run (see criteria.js).
+ */
+function pageContext(options, securityOptions, ruleOutcomes) {
   return {
     mode: options.mode ?? 'balanced',
+    lang: options.lang ?? 'en',
     includeTags: options.includeTags,
     excludeRules: options.excludeRules,
     timeout: options.timeout ?? DEFAULT_TIMEOUT_MS,
     securityOptions,
-    keyboard: options.keyboard
+    keyboard: options.keyboard,
+    ruleOutcomes
+  };
+}
+
+/** Common shape of every scan result. */
+function buildResult({ target, options, issues, pagesScanned, ruleOutcomes, ...extra }) {
+  return {
+    target,
+    mode: options.mode ?? 'balanced',
+    lang: options.lang ?? 'en',
+    rgaaVersion: RGAA_VERSION,
+    generatedAt: new Date().toISOString(),
+    issues,
+    ...extra,
+    criteria: buildCriteriaView(ruleOutcomes, issues, KEYBOARD_RULES),
+    summary: summarizeIssues(issues, pagesScanned)
   };
 }
 
@@ -83,7 +106,7 @@ function pageContext(options, securityOptions) {
 async function scanPage(
   page,
   url,
-  { mode, includeTags, excludeRules, timeout, securityOptions, keyboard }
+  { mode, lang, includeTags, excludeRules, timeout, securityOptions, keyboard, ruleOutcomes }
 ) {
   const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout });
   if (response && response.status() >= 400) {
@@ -104,9 +127,16 @@ async function scanPage(
   if (excludeRules?.length) builder = builder.disableRules(excludeRules);
 
   const results = await builder.analyze();
-  const issues = results.violations.map((violation) => enrichViolation(violation, url, mode));
+  recordAxeOutcomes(ruleOutcomes, results);
+  const issues = results.violations.map((violation) =>
+    enrichViolation(violation, url, mode, { lang })
+  );
   if (keyboard !== false) {
-    issues.push(...(await runKeyboardChecks(page, url, mode)));
+    const keyboardResult = await runKeyboardChecks(page, url, mode, { lang });
+    issues.push(...keyboardResult.issues);
+    for (const [ruleId, outcome] of Object.entries(keyboardResult.outcomes)) {
+      recordOutcome(ruleOutcomes, ruleId, outcome);
+    }
   }
   return issues;
 }
@@ -122,15 +152,14 @@ export async function scanRemoteUrl(url, options = {}) {
   try {
     const context = await browser.newContext();
     const page = await context.newPage();
-    const issues = await scanPage(page, resolvedUrl, pageContext(options, securityOptions));
+    const ruleOutcomes = new Map();
+    const issues = await scanPage(
+      page,
+      resolvedUrl,
+      pageContext(options, securityOptions, ruleOutcomes)
+    );
 
-    return {
-      target: resolvedUrl,
-      mode: options.mode ?? 'balanced',
-      generatedAt: new Date().toISOString(),
-      issues,
-      summary: summarizeIssues(issues, 1)
-    };
+    return buildResult({ target: resolvedUrl, options, issues, pagesScanned: 1, ruleOutcomes });
   } finally {
     await browser.close();
   }
@@ -145,7 +174,6 @@ export async function scanRemoteUrl(url, options = {}) {
  */
 export async function scanSitemap(siteUrl, options = {}) {
   const securityOptions = getSecurityOptions(options);
-  const mode = options.mode ?? 'balanced';
   const { sitemaps, urls } = await discoverSitemapUrls(siteUrl, {
     securityOptions,
     maxPages: options.maxPages,
@@ -161,6 +189,7 @@ export async function scanSitemap(siteUrl, options = {}) {
     const page = await context.newPage();
     const issues = [];
     const pageErrors = [];
+    const ruleOutcomes = new Map();
     let pagesScanned = 0;
 
     for (let i = 0; i < urls.length; i++) {
@@ -168,7 +197,9 @@ export async function scanSitemap(siteUrl, options = {}) {
       options.onProgress?.({ current: i + 1, total: urls.length, route: url });
       try {
         const safeUrl = await resolveSafeRemoteUrl(url, securityOptions);
-        issues.push(...(await scanPage(page, safeUrl, pageContext(options, securityOptions))));
+        issues.push(
+          ...(await scanPage(page, safeUrl, pageContext(options, securityOptions, ruleOutcomes)))
+        );
         pagesScanned += 1;
       } catch (error) {
         pageErrors.push({
@@ -178,16 +209,16 @@ export async function scanSitemap(siteUrl, options = {}) {
       }
     }
 
-    return {
+    return buildResult({
       target: siteUrl,
-      mode,
-      generatedAt: new Date().toISOString(),
+      options,
       issues,
+      pagesScanned,
+      ruleOutcomes,
       routes: urls,
       sitemaps,
-      pageErrors,
-      summary: summarizeIssues(issues, pagesScanned)
-    };
+      pageErrors
+    });
   } finally {
     await browser.close();
   }
@@ -209,6 +240,7 @@ export async function scanDirectory(rootDir, options = {}) {
     const context = await browser.newContext();
     const page = await context.newPage();
     const issues = [];
+    const ruleOutcomes = new Map();
 
     for (let i = 0; i < routes.length; i++) {
       const route = routes[i];
@@ -217,19 +249,19 @@ export async function scanDirectory(rootDir, options = {}) {
       const pageIssues = await scanPage(
         page,
         url,
-        pageContext(options, getSecurityOptions(options))
+        pageContext(options, getSecurityOptions(options), ruleOutcomes)
       );
       issues.push(...pageIssues);
     }
 
-    return {
+    return buildResult({
       target: path.resolve(rootDir),
-      mode: options.mode ?? 'balanced',
-      generatedAt: new Date().toISOString(),
+      options,
       issues,
-      routes,
-      summary: summarizeIssues(issues, routes.length)
-    };
+      pagesScanned: routes.length,
+      ruleOutcomes,
+      routes
+    });
   } finally {
     await browser.close();
     await server.close();
