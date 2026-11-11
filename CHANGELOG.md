@@ -6,6 +6,9 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- `--sitemap [url]` and `--max-pages <n>`: scan every page of a deployed site from its sitemaps (robots.txt, `/sitemap-index.xml`, `/sitemap.xml`, sitemap indexes), same-host only, with the remote security guards on every request. Unreachable pages are reported (`pageErrors`) and fail a gated run. Also `sitemap` / `max-pages` inputs in the GitHub Action.
+- Pages answering HTTP 4xx/5xx are reported as errors instead of being scanned as content.
+
 - Baselines: `--write-baseline <file>` records known issues, `--baseline <file>` marks new issues and makes the failure threshold count only them (also `baseline` option in the integration).
 - `github` report format: compact Markdown for pull request comments and job summaries (`--report-url` links the full report).
 - GitHub Action (`action.yml`): scan, sticky pull request comment, job summary, report artifact, baseline-aware failure.

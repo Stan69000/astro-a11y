@@ -100,6 +100,7 @@ a { color: #1d4ed8; }
   <section class="grid" aria-labelledby="issues-heading">
     <h2 id="issues-heading" class="sr-only">Issues</h2>
     ${issueCards || '<div class="card"><p>No accessibility issues detected. The configured automated checks did not report any issue.</p></div>'}
+    ${result.pageErrors?.length ? `<article class="card"><h2>Pages that could not be scanned</h2><ul>${result.pageErrors.map((error) => `<li>${escapeHtml(error.page)}: ${escapeHtml(error.message)}</li>`).join("")}</ul></article>` : ""}
   </section>
 </div>
 </body>

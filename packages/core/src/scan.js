@@ -6,6 +6,7 @@ import { collectHtmlRoutesFromDirectory } from './routes.js';
 import { startStaticServer } from './static-server.js';
 import { enrichViolation } from './mappings.js';
 import { launchChromium } from './browser.js';
+import { discoverSitemapUrls } from './sitemap.js';
 
 const DEFAULT_TIMEOUT_MS = 15000;
 const isCI = process.env.CI === 'true';
@@ -62,7 +63,10 @@ async function resolveDirectoryRoutes(rootDir, providedRoutes) {
 }
 
 async function scanPage(page, url, mode, includeTags, excludeRules, timeout, securityOptions) {
-  await page.goto(url, { waitUntil: 'domcontentloaded', timeout });
+  const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout });
+  if (response && response.status() >= 400) {
+    throw new Error(`HTTP ${response.status()} for ${url}`);
+  }
 
   const finalUrl = page.url();
   if (finalUrl !== url && isUrl(finalUrl)) {
@@ -109,6 +113,74 @@ export async function scanRemoteUrl(url, options = {}) {
       generatedAt: new Date().toISOString(),
       issues,
       summary: summarizeIssues(issues, 1)
+    };
+  } finally {
+    await browser.close();
+  }
+}
+
+/**
+ * Scans every page listed in a remote site's sitemaps (up to `maxPages`).
+ * A page that fails to load is recorded in `pageErrors` instead of aborting the scan.
+ *
+ * @param {string} siteUrl
+ * @param {object} options Scan options, plus `maxPages` and `sitemapUrl`.
+ */
+export async function scanSitemap(siteUrl, options = {}) {
+  const securityOptions = getSecurityOptions(options);
+  const mode = options.mode ?? 'balanced';
+  const timeout = options.timeout ?? DEFAULT_TIMEOUT_MS;
+  const { sitemaps, urls } = await discoverSitemapUrls(siteUrl, {
+    securityOptions,
+    maxPages: options.maxPages,
+    sitemapUrl: options.sitemapUrl
+  });
+
+  const browser = await launchChromium({
+    headless: true,
+    args: resolveLaunchArgs(options)
+  });
+  try {
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    const issues = [];
+    const pageErrors = [];
+    let pagesScanned = 0;
+
+    for (let i = 0; i < urls.length; i++) {
+      const url = urls[i];
+      options.onProgress?.({ current: i + 1, total: urls.length, route: url });
+      try {
+        const safeUrl = await resolveSafeRemoteUrl(url, securityOptions);
+        issues.push(
+          ...(await scanPage(
+            page,
+            safeUrl,
+            mode,
+            options.includeTags,
+            options.excludeRules,
+            timeout,
+            securityOptions
+          ))
+        );
+        pagesScanned += 1;
+      } catch (error) {
+        pageErrors.push({
+          page: url,
+          message: error instanceof Error ? error.message : String(error)
+        });
+      }
+    }
+
+    return {
+      target: siteUrl,
+      mode,
+      generatedAt: new Date().toISOString(),
+      issues,
+      routes: urls,
+      sitemaps,
+      pageErrors,
+      summary: summarizeIssues(issues, pagesScanned)
     };
   } finally {
     await browser.close();
@@ -165,7 +237,7 @@ export async function scanDirectory(rootDir, options = {}) {
 
 export async function scanTarget(target, options = {}) {
   if (isUrl(target)) {
-    return scanRemoteUrl(target, options);
+    return options.sitemap ? scanSitemap(target, options) : scanRemoteUrl(target, options);
   }
   return scanDirectory(target, options);
 }

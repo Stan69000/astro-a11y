@@ -1,4 +1,4 @@
-export { scanTarget, scanRemoteUrl, scanDirectory, summarizeIssues } from './scan.js';
+export { scanTarget, scanRemoteUrl, scanSitemap, scanDirectory, summarizeIssues } from './scan.js';
 export {
   assertAllowedRemoteTarget,
   isPrivateHost,
@@ -37,3 +37,9 @@ export {
   pageKey,
   parseBaseline
 } from './baseline.js';
+export {
+  DEFAULT_MAX_PAGES,
+  discoverSitemapUrls,
+  parseRobotsSitemaps,
+  parseSitemap
+} from './sitemap.js';
