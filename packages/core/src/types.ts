@@ -60,6 +60,8 @@ export interface ScanOptions {
   includeTags?: string[];
   excludeRules?: string[];
   timeout?: number;
+  /** Run the keyboard checks (default: true). */
+  keyboard?: boolean;
   onProgress?: (progress: ProgressInfo) => void;
 }
 
@@ -80,4 +82,6 @@ export interface AstroA11yOptions {
   excludeRules?: string[];
   timeout?: number;
   showProgress?: boolean;
+  keyboard?: boolean;
+  baseline?: string;
 }

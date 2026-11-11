@@ -157,6 +157,18 @@ npx astro-a11y report --input reports/report.json --format html --output reports
 
 Un seuil explicite l'emporte toujours : `--fail-on <sévérité>` (CLI) ou `failOn` (intégration), avec `critical`, `major`, `minor` ou `info`. Un mode ou un seuil invalide est refusé avec une erreur au lieu d'être ignoré en silence.
 
+## Tests clavier
+
+En plus d'axe-core, chaque page est parcourue avec la touche Tab (désactivable avec `--no-keyboard` ou `keyboard: false`) :
+
+| Test | RGAA | Sévérité | Détecte |
+| --- | --- | --- | --- |
+| `keyboard-trap` | 12.9 | critical | Tab tourne en boucle sur quelques éléments sans jamais atteindre le reste de la page |
+| `keyboard-focus-visible` | 10.7 | minor | Un élément reçoit le focus clavier sans contour ni changement de style |
+| `keyboard-skip-link` | 12.7 | major | Le premier lien pointe vers une ancre absente, ou son activation ne déplace pas la navigation clavier vers sa cible |
+
+`keyboard-focus-visible` est `minor`, car un changement visible peut rester trop discret, et un indicateur dessiné par un script n'est pas détectable : à confirmer à la main. La cohérence de l'ordre de tabulation (RGAA 12.8) demande toujours un humain.
+
 ## Baseline : adopter l'outil sur un site existant
 
 Enregistrez une fois les problèmes actuels, puis n'échouez que sur les nouveaux :
@@ -255,6 +267,7 @@ Toutes les pages pré-rendues sont analysées, y compris celles générées par 
 | `timeout` | `15000` | Délai de chargement d'une page (ms) |
 | `showProgress` | `false` | Affiche chaque page analysée |
 | `baseline` | — | Fichier de baseline, relatif à la racine du projet |
+| `keyboard` | `true` | Lance les tests clavier |
 
 ## Porté par Le Singe du Numérique
 

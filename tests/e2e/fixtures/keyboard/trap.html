@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><title>Piège</title></head>
+<body><main><h1>Titre</h1>
+  <div id="widget"><input aria-label="Un" id="un"> <input aria-label="Deux" id="deux"></div>
+  <a href="/apres">Lien inaccessible</a>
+</main>
+<script>
+  document.getElementById('widget').addEventListener('keydown', (event) => {
+    if (event.key !== 'Tab') return;
+    event.preventDefault();
+    const next = document.activeElement.id === 'un' ? 'deux' : 'un';
+    document.getElementById(next).focus();
+  });
+</script></body></html>
