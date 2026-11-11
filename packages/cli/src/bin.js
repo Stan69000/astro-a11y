@@ -84,6 +84,7 @@ program
     'For a URL target: scan the pages listed in the site sitemaps (robots.txt, /sitemap-index.xml, /sitemap.xml) or in the given sitemap'
   )
   .option('--max-pages <count>', 'Maximum number of pages scanned with --sitemap', '50')
+  .option('--no-keyboard', 'Skip the keyboard checks (focus visibility, keyboard traps, skip link)')
   .action(async (target, options) => {
     const mode = options.mode ?? 'balanced';
     if (!isScanMode(mode)) {
@@ -151,6 +152,7 @@ program
       onProgress,
       includeTags: options.includeTags,
       excludeRules: options.excludeRules,
+      keyboard: options.keyboard,
       sitemap: Boolean(options.sitemap),
       sitemapUrl: typeof options.sitemap === 'string' ? options.sitemap : undefined,
       maxPages

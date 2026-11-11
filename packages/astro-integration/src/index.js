@@ -50,6 +50,7 @@ export default function astroA11y(options = {}) {
   const includeTags = options.includeTags;
   const excludeRules = options.excludeRules;
   const baselinePath = options.baseline;
+  const keyboard = options.keyboard ?? true;
 
   validateOptions({ mode, failOn, outputDirName, reportFormats });
   const failThreshold = resolveFailThreshold({ mode, failOn, failByDefault: failOnBuild });
@@ -92,7 +93,8 @@ export default function astroA11y(options = {}) {
           timeout,
           onProgress,
           includeTags,
-          excludeRules
+          excludeRules,
+          keyboard
         });
         const result = baseline ? applyBaseline(scanResult, baseline) : scanResult;
 

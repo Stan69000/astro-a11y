@@ -13,6 +13,7 @@ export {
   REPORT_GENERATOR
 } from './routes.js';
 export { startStaticServer } from './static-server.js';
+export { KEYBOARD_RULES, runKeyboardChecks } from './keyboard.js';
 export {
   SEVERITY_ORDER,
   SCAN_MODES,

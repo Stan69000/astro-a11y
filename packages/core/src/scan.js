@@ -6,6 +6,7 @@ import { collectHtmlRoutesFromDirectory } from './routes.js';
 import { startStaticServer } from './static-server.js';
 import { enrichViolation } from './mappings.js';
 import { launchChromium } from './browser.js';
+import { runKeyboardChecks } from './keyboard.js';
 import { discoverSitemapUrls } from './sitemap.js';
 
 const DEFAULT_TIMEOUT_MS = 15000;
@@ -62,7 +63,28 @@ async function resolveDirectoryRoutes(rootDir, providedRoutes) {
   return collectHtmlRoutesFromDirectory(rootDir);
 }
 
-async function scanPage(page, url, mode, includeTags, excludeRules, timeout, securityOptions) {
+function pageContext(options, securityOptions) {
+  return {
+    mode: options.mode ?? 'balanced',
+    includeTags: options.includeTags,
+    excludeRules: options.excludeRules,
+    timeout: options.timeout ?? DEFAULT_TIMEOUT_MS,
+    securityOptions,
+    keyboard: options.keyboard
+  };
+}
+
+/**
+ * @param {import('playwright').Page} page
+ * @param {string} url
+ * @param {{ mode: string, includeTags?: string[], excludeRules?: string[], timeout: number,
+ *   securityOptions?: object, keyboard?: boolean }} context
+ */
+async function scanPage(
+  page,
+  url,
+  { mode, includeTags, excludeRules, timeout, securityOptions, keyboard }
+) {
   const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout });
   if (response && response.status() >= 400) {
     throw new Error(`HTTP ${response.status()} for ${url}`);
@@ -82,13 +104,16 @@ async function scanPage(page, url, mode, includeTags, excludeRules, timeout, sec
   if (excludeRules?.length) builder = builder.disableRules(excludeRules);
 
   const results = await builder.analyze();
-  return results.violations.map((violation) => enrichViolation(violation, url, mode));
+  const issues = results.violations.map((violation) => enrichViolation(violation, url, mode));
+  if (keyboard !== false) {
+    issues.push(...(await runKeyboardChecks(page, url, mode)));
+  }
+  return issues;
 }
 
 export async function scanRemoteUrl(url, options = {}) {
   const securityOptions = getSecurityOptions(options);
   const resolvedUrl = await resolveSafeRemoteUrl(url, securityOptions);
-  const timeout = options.timeout ?? DEFAULT_TIMEOUT_MS;
 
   const browser = await launchChromium({
     headless: true,
@@ -97,15 +122,7 @@ export async function scanRemoteUrl(url, options = {}) {
   try {
     const context = await browser.newContext();
     const page = await context.newPage();
-    const issues = await scanPage(
-      page,
-      resolvedUrl,
-      options.mode ?? 'balanced',
-      options.includeTags,
-      options.excludeRules,
-      timeout,
-      securityOptions
-    );
+    const issues = await scanPage(page, resolvedUrl, pageContext(options, securityOptions));
 
     return {
       target: resolvedUrl,
@@ -129,7 +146,6 @@ export async function scanRemoteUrl(url, options = {}) {
 export async function scanSitemap(siteUrl, options = {}) {
   const securityOptions = getSecurityOptions(options);
   const mode = options.mode ?? 'balanced';
-  const timeout = options.timeout ?? DEFAULT_TIMEOUT_MS;
   const { sitemaps, urls } = await discoverSitemapUrls(siteUrl, {
     securityOptions,
     maxPages: options.maxPages,
@@ -152,17 +168,7 @@ export async function scanSitemap(siteUrl, options = {}) {
       options.onProgress?.({ current: i + 1, total: urls.length, route: url });
       try {
         const safeUrl = await resolveSafeRemoteUrl(url, securityOptions);
-        issues.push(
-          ...(await scanPage(
-            page,
-            safeUrl,
-            mode,
-            options.includeTags,
-            options.excludeRules,
-            timeout,
-            securityOptions
-          ))
-        );
+        issues.push(...(await scanPage(page, safeUrl, pageContext(options, securityOptions))));
         pagesScanned += 1;
       } catch (error) {
         pageErrors.push({
@@ -191,7 +197,6 @@ export async function scanDirectory(rootDir, options = {}) {
   const stat = await fs.stat(rootDir);
   if (!stat.isDirectory()) throw new Error(`Target is not a directory: ${rootDir}`);
 
-  const timeout = options.timeout ?? DEFAULT_TIMEOUT_MS;
   const progress = options.onProgress;
   const routes = await resolveDirectoryRoutes(rootDir, options.routes);
   const server = await startStaticServer(rootDir);
@@ -212,11 +217,7 @@ export async function scanDirectory(rootDir, options = {}) {
       const pageIssues = await scanPage(
         page,
         url,
-        options.mode ?? 'balanced',
-        options.includeTags,
-        options.excludeRules,
-        timeout,
-        getSecurityOptions(options)
+        pageContext(options, getSecurityOptions(options))
       );
       issues.push(...pageIssues);
     }
