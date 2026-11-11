@@ -139,10 +139,10 @@ On top of axe-core, every page is browsed with the Tab key (disable with `--no-k
 | Check | RGAA | Severity | Detects |
 | --- | --- | --- | --- |
 | `keyboard-trap` | 12.9 | critical | Tab keeps cycling through a few elements and never reaches the rest of the page |
-| `focus-visible` | 10.7 | minor | An element gets keyboard focus with no outline and no style change |
-| `skip-link` | 12.7 | major | The first link points to a missing anchor, or activating it does not move keyboard navigation to its target |
+| `keyboard-focus-visible` | 10.7 | minor | An element gets keyboard focus with no outline and no style change |
+| `keyboard-skip-link` | 12.7 | major | The first link points to a missing anchor, or activating it does not move keyboard navigation to its target |
 
-`focus-visible` is `minor` because a visible change can still be too faint, and an indicator drawn by a script cannot be detected: confirm it manually. A coherent tab order (RGAA 12.8) still needs a human.
+`keyboard-focus-visible` is `minor` because a visible change can still be too faint, and an indicator drawn by a script cannot be detected: confirm it manually. A coherent tab order (RGAA 12.8) still needs a human.
 
 ## Baseline: adopt it on an existing site
 

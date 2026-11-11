@@ -40,7 +40,7 @@ test('a keyboard-friendly page has no keyboard issue', async () => {
 
 test('detects a removed focus outline, but not a :focus-visible replacement', async () => {
   const issues = await check('no-outline.html');
-  assert.deepEqual(ids(issues), ['focus-visible']);
+  assert.deepEqual(ids(issues), ['keyboard-focus-visible']);
   assert.equal(issues[0].rgaa, '10.7');
   assert.deepEqual(
     issues[0].nodes.map((node) => node.target),
@@ -58,13 +58,13 @@ test('detects a keyboard trap', async () => {
 
 test('detects a skip link without target', async () => {
   const issues = await check('broken-skip.html');
-  assert.deepEqual(ids(issues), ['skip-link']);
+  assert.deepEqual(ids(issues), ['keyboard-skip-link']);
   assert.match(issues[0].nodes[0].failureSummary, /No element with id "contenu"/);
 });
 
 test('detects a skip link cancelled by JavaScript', async () => {
   const issues = await check('cancelled-skip.html');
-  assert.deepEqual(ids(issues), ['skip-link']);
+  assert.deepEqual(ids(issues), ['keyboard-skip-link']);
   assert.match(issues[0].nodes[0].failureSummary, /Tab does not continue from its target/);
 });
 

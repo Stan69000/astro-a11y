@@ -4,9 +4,9 @@
  *
  * - keyboard-trap (RGAA 12.9): Tab keeps cycling through a few elements and
  *   never reaches the rest of the page.
- * - focus-visible (RGAA 10.7): an element receives keyboard focus without any
+ * - keyboard-focus-visible (RGAA 10.7): an element receives keyboard focus without any
  *   visible change (no outline, no style difference).
- * - skip-link (RGAA 12.7): the first focusable element is an in-page link whose
+ * - keyboard-skip-link (RGAA 12.7): the first focusable element is an in-page link whose
  *   target is missing, or that does not move keyboard navigation to its target.
  *
  * They complement a manual audit: a visible focus can still be too faint, and
@@ -23,7 +23,7 @@ export const KEYBOARD_RULES = Object.freeze({
       'Let Tab and Shift+Tab leave the component. For modal dialogs, trap focus only while the dialog is open and close it with Escape.',
     help: 'Focus must be able to move away from every element with the Tab key.'
   },
-  'focus-visible': {
+  'keyboard-focus-visible': {
     rgaa: '10.7',
     severity: 'minor',
     title: 'Keyboard focus is not visible',
@@ -34,7 +34,7 @@ export const KEYBOARD_RULES = Object.freeze({
     after: 'a:focus-visible { outline: 3px solid #1d4ed8; outline-offset: 2px; }',
     help: 'Every element that receives keyboard focus must show a visible focus indicator.'
   },
-  'skip-link': {
+  'keyboard-skip-link': {
     rgaa: '12.7',
     severity: 'major',
     title: 'Skip link does not work',
@@ -225,7 +225,7 @@ export async function runKeyboardChecks(page, url, mode) {
   if (invisible.length > 0) {
     issues.push(
       makeIssue(
-        'focus-visible',
+        'keyboard-focus-visible',
         url,
         mode,
         invisible.map((info) => ({
@@ -239,7 +239,7 @@ export async function runKeyboardChecks(page, url, mode) {
 
   const skipLinkProblem = visited[0] ? await checkSkipLink(page, visited[0].handle) : null;
   if (skipLinkProblem) {
-    issues.push(makeIssue('skip-link', url, mode, [skipLinkProblem]));
+    issues.push(makeIssue('keyboard-skip-link', url, mode, [skipLinkProblem]));
   }
 
   await Promise.all(visited.map((entry) => entry.handle.dispose()));
