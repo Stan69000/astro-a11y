@@ -6,7 +6,12 @@ export {
   resolveSafeRemoteUrl
 } from './security.js';
 export { enrichViolation, mapAxeToRgaa, RGAA_VERSION } from './mappings.js';
-export { collectHtmlRoutesFromDirectory, htmlFileToRoute } from './routes.js';
+export {
+  collectHtmlRoutesFromDirectory,
+  htmlFileToRoute,
+  isGeneratedReport,
+  REPORT_GENERATOR
+} from './routes.js';
 export { startStaticServer } from './static-server.js';
 export {
   SEVERITY_ORDER,
