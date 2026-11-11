@@ -8,10 +8,17 @@ export function renderTerminal(result) {
   lines.push(
     `Issues: critical=${result.summary.issuesBySeverity.critical}, major=${result.summary.issuesBySeverity.major}, minor=${result.summary.issuesBySeverity.minor}, info=${result.summary.issuesBySeverity.info}`
   );
+  const fresh = result.summary.newIssuesBySeverity;
+  if (fresh) {
+    lines.push(
+      `New since baseline: critical=${fresh.critical}, major=${fresh.major}, minor=${fresh.minor}, info=${fresh.info} · fixed elements: ${result.summary.baseline?.fixedElements ?? 0}`
+    );
+  }
   lines.push("");
 
   for (const issue of result.issues) {
-    lines.push(`[${issue.severity.toUpperCase()}] ${issue.title} — RGAA ${issue.rgaa}`);
+    const marker = issue.isNew ? "[NEW] " : "";
+    lines.push(`${marker}[${issue.severity.toUpperCase()}] ${issue.title} — RGAA ${issue.rgaa}`);
     lines.push(`Page: ${issue.page}`);
     lines.push(`Rule: ${issue.id}`);
     if (issue.howToFix) lines.push(`Fix: ${issue.howToFix}`);

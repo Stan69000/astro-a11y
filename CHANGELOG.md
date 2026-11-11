@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- Baselines: `--write-baseline <file>` records known issues, `--baseline <file>` marks new issues and makes the failure threshold count only them (also `baseline` option in the integration).
+- `github` report format: compact Markdown for pull request comments and job summaries (`--report-url` links the full report).
+- GitHub Action (`action.yml`): scan, sticky pull request comment, job summary, report artifact, baseline-aware failure.
+
 - `astro-a11y install-browser [--with-deps]` downloads the Chromium build matching the bundled Playwright; a missing browser now fails with this command in the error message.
 - Release workflow (`.github/workflows/release.yml`): npm trusted publishing (OIDC, no stored token) with provenance; `scripts/check-release.js` and `RELEASING.md`.
 - npm metadata on every package (license, repository, homepage, engines, README, LICENSE).

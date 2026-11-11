@@ -21,3 +21,37 @@ jobs:
       - run: pnpm test
       - run: pnpm build
       - run: pnpm audit --prod
+
+  action:
+    # Runs the repository's own GitHub Action on the example fixture.
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Strict scan with the committed baseline (must pass)
+        id: with-baseline
+        uses: ./
+        with:
+          target: examples/static-site/site
+          mode: strict
+          baseline: examples/static-site/a11y-baseline.json
+          artifact-name: astro-a11y-self-test
+      - name: Strict scan without baseline (must fail)
+        id: without-baseline
+        continue-on-error: true
+        uses: ./
+        with:
+          target: examples/static-site/site
+          mode: strict
+          comment: 'false'
+          upload-report: 'false'
+      - name: Check outcomes
+        env:
+          NEW_WITH_BASELINE: ${{ steps.with-baseline.outputs.new-issues }}
+          OUTCOME_WITHOUT_BASELINE: ${{ steps.without-baseline.outcome }}
+        run: |
+          test "$NEW_WITH_BASELINE" = "0"
+          test "$OUTCOME_WITHOUT_BASELINE" = "failure"

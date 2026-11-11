@@ -1,7 +1,9 @@
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
+  applyBaseline,
+  parseBaseline,
   scanDirectory,
   SEVERITY_ORDER,
   SCAN_MODES,
@@ -47,16 +49,19 @@ export default function astroA11y(options = {}) {
   const showProgress = options.showProgress ?? false;
   const includeTags = options.includeTags;
   const excludeRules = options.excludeRules;
+  const baselinePath = options.baseline;
 
   validateOptions({ mode, failOn, outputDirName, reportFormats });
   const failThreshold = resolveFailThreshold({ mode, failOn, failByDefault: failOnBuild });
 
   let prerenderedPages = [];
+  let projectRoot = process.cwd();
 
   return {
     name: 'astro-a11y',
     hooks: {
-      'astro:config:setup'({ logger }) {
+      'astro:config:setup'({ config, logger }) {
+        projectRoot = fileURLToPath(config.root);
         logger.info(`enabled in ${mode} mode.`);
       },
 
@@ -76,7 +81,11 @@ export default function astroA11y(options = {}) {
         const onProgress = showProgress
           ? ({ current, total, route }) => logger.info(`Scanning ${current}/${total}: ${route}`)
           : undefined;
-        const result = await scanDirectory(rootDir, {
+        // Read the baseline before scanning, so a wrong path fails before the browser starts.
+        const baseline = baselinePath
+          ? parseBaseline(await readFile(path.resolve(projectRoot, baselinePath), 'utf8'))
+          : undefined;
+        const scanResult = await scanDirectory(rootDir, {
           mode,
           // An empty list makes the scanner crawl the output directory instead.
           routes,
@@ -85,6 +94,7 @@ export default function astroA11y(options = {}) {
           includeTags,
           excludeRules
         });
+        const result = baseline ? applyBaseline(scanResult, baseline) : scanResult;
 
         logger.info(renderByFormat(result, 'terminal'));
 

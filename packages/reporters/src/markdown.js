@@ -1,4 +1,4 @@
-function escapeMd(value) {
+export function escapeMd(value) {
   return String(value ?? "")
     .replace(/\\/g, "\\\\")
     .replace(/[*_`[\]()#+\-!]/g, (c) => `\\${c}`)
@@ -14,12 +14,18 @@ export function renderMarkdown(result) {
   lines.push(`- **Mode:** ${result.mode}`);
   lines.push(`- **Generated:** ${result.generatedAt}`);
   lines.push(`- **Pages scanned:** ${result.summary.pagesScanned}`);
+  const fresh = result.summary.newIssuesBySeverity;
+  if (fresh) {
+    lines.push(`- **New since baseline:** critical=${fresh.critical}, major=${fresh.major}, minor=${fresh.minor}, info=${fresh.info}`);
+    lines.push(`- **Fixed since baseline:** ${result.summary.baseline?.fixedElements ?? 0} element(s)`);
+  }
   lines.push("");
   lines.push("| Severity | Rule | RGAA | Page | Title |");
   lines.push("|---|---|---|---|---|");
 
   for (const issue of result.issues) {
-    lines.push(`| ${escapeMd(issue.severity)} | ${escapeMd(issue.id)} | ${escapeMd(issue.rgaa)} | ${escapeMd(issue.page)} | ${escapeMd(issue.title)} |`);
+    const severity = issue.isNew ? `${escapeMd(issue.severity)} (new)` : escapeMd(issue.severity);
+    lines.push(`| ${severity} | ${escapeMd(issue.id)} | ${escapeMd(issue.rgaa)} | ${escapeMd(issue.page)} | ${escapeMd(issue.title)} |`);
   }
 
   lines.push("");

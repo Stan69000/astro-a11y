@@ -43,7 +43,9 @@ export function resolveFailThreshold({ mode = 'balanced', failOn, failByDefault 
 }
 
 /**
- * @param {{ issuesBySeverity: Record<string, number> }} summary
+ * When a baseline was applied (`summary.newIssuesBySeverity`), only new issues count.
+ *
+ * @param {{ issuesBySeverity: Record<string, number>, newIssuesBySeverity?: Record<string, number> }} summary
  * @param {string | null} threshold
  * @returns {boolean}
  */
@@ -51,7 +53,6 @@ export function hasIssuesAtOrAbove(summary, threshold) {
   if (threshold === null) return false;
   const thresholdIndex = SEVERITY_ORDER.indexOf(threshold);
   if (thresholdIndex === -1) return false;
-  return SEVERITY_ORDER.slice(thresholdIndex).some(
-    (severity) => (summary.issuesBySeverity[severity] ?? 0) > 0
-  );
+  const counts = summary.newIssuesBySeverity ?? summary.issuesBySeverity;
+  return SEVERITY_ORDER.slice(thresholdIndex).some((severity) => (counts[severity] ?? 0) > 0);
 }

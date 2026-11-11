@@ -28,3 +28,12 @@ export {
   launchChromium,
   playwrightCliPath
 } from './browser.js';
+export {
+  BASELINE_VERSION,
+  applyBaseline,
+  createBaseline,
+  issueFingerprints,
+  nodeFingerprint,
+  pageKey,
+  parseBaseline
+} from './baseline.js';
