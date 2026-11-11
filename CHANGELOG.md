@@ -6,6 +6,13 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- Learning mode reports (`--mode learning`): issues grouped by rule, explained in plain words, with who is affected and how to experience the problem yourself (lessons for the 34 criteria checked, in English and French), plus what already works and what to check by hand.
+- The HTML report is now accessible itself (`<main>` landmark) and checked with axe-core in the e2e tests.
+
+### Fixed
+
+- HTML tags in explanations (`<label for>`, `<marquee>`…) are escaped in Markdown reports instead of being interpreted by Markdown renderers.
+
 - RGAA mapping extended from 17 to 87 axe-core rules (images, frames, colors, media, tables, links, ARIA, mandatory elements, structure, presentation, forms, navigation, consultation), each with English and French texts. Unmapped rules take their severity from axe's impact.
 - `--lang fr` / `lang: 'fr'` / Action `lang` input: issue texts and every report format in French.
 - Per-criterion view in every report (`criteria` in JSON): outcome of each RGAA criterion touched by the rules that ran (issues found, to check manually, no issue detected, not applicable), with counts and worst severity.

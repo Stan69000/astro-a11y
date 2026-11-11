@@ -42,6 +42,15 @@ const LABELS = {
     },
     criteriaNote: (version) =>
       `RGAA ${version}. Automated checks only: "No issue detected" does not mean compliant, most criteria also need a manual check.`,
+    learningIntro:
+      'Learning mode: issues are grouped by topic and explained in plain words. Start with the critical ones, then try each problem yourself: it is the best way to understand it.',
+    toFix: 'What to fix',
+    whoIsAffected: 'Who is affected',
+    tryIt: 'See it for yourself',
+    where: 'Where',
+    goingWell: 'What already works (automated checks)',
+    toCheckByHand: 'To check by hand',
+    occurrences: (pages, elements) => `${pages} page(s), ${elements} element(s)`,
     commentTitle: 'astro-a11y accessibility report',
     noNewIssue: '**No new issue** compared with the baseline.',
     newIssues: (total, c) =>
@@ -96,6 +105,15 @@ const LABELS = {
     },
     criteriaNote: (version) =>
       `RGAA ${version}. Tests automatiques uniquement : « Aucun problème détecté » ne veut pas dire conforme, la plupart des critères demandent aussi une vérification humaine.`,
+    learningIntro:
+      'Mode pédagogique : les problèmes sont regroupés par sujet et expliqués simplement. Commencez par les critiques, puis essayez chaque problème vous-même : c’est la meilleure façon de le comprendre.',
+    toFix: 'À corriger',
+    whoIsAffected: 'Qui est gêné',
+    tryIt: 'Le constater soi-même',
+    where: 'Où',
+    goingWell: 'Ce qui fonctionne déjà (tests automatiques)',
+    toCheckByHand: 'À vérifier à la main',
+    occurrences: (pages, elements) => `${pages} page(s), ${elements} élément(s)`,
     commentTitle: 'Rapport d’accessibilité astro-a11y',
     noNewIssue: '**Aucun nouveau problème** par rapport à la baseline.',
     newIssues: (total, c) =>

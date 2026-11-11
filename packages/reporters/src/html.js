@@ -1,4 +1,5 @@
 import { labels, severityLabel } from "./i18n.js";
+import { groupIssuesByRule } from "./learning.js";
 
 /**
  * Marks the HTML report so the scanner never audits its own reports when a
@@ -51,6 +52,50 @@ function renderCriteria(result, t) {
     </div>
     <p class="note">${escapeHtml(t.criteriaNote(result.rgaaVersion ?? "4.1.2"))}</p>
   </section>`;
+}
+
+/** Learning layout: one card per topic, explained in plain words, then what already works. */
+function renderLearningBody(result, t) {
+  const groups = groupIssuesByRule(result.issues);
+  const cards = groups.map((group, index) => `
+    <article class="card lesson">
+      <div class="${badgeClass(group.severity)}">${escapeHtml(severityLabel(t, group.severity).toUpperCase())}</div>
+      <h3>${index + 1}. ${escapeHtml(group.title)}</h3>
+      <p class="criterion-line">RGAA <strong>${escapeHtml(group.rgaa)}</strong>${group.rgaaTitle ? ` — ${escapeHtml(group.rgaaTitle)}` : ""}</p>
+      <dl>
+        <dt>${escapeHtml(t.why)}</dt><dd>${escapeHtml(group.why)}</dd>
+        ${group.learn?.who?.length ? `<dt>${escapeHtml(t.whoIsAffected)}</dt><dd><ul>${group.learn.who.map((who) => `<li>${escapeHtml(who)}</li>`).join("")}</ul></dd>` : ""}
+        ${group.learn?.tryIt ? `<dt>${escapeHtml(t.tryIt)}</dt><dd>${escapeHtml(group.learn.tryIt)}</dd>` : ""}
+        <dt>${escapeHtml(t.fix)}</dt><dd>${escapeHtml(group.howToFix)}</dd>
+      </dl>
+      ${group.before || group.after ? `
+      <div class="example">
+        ${group.before ? `<div><strong>${escapeHtml(t.before)}</strong><pre>${escapeHtml(group.before)}</pre></div>` : ""}
+        ${group.after ? `<div><strong>${escapeHtml(t.after)}</strong><pre>${escapeHtml(group.after)}</pre></div>` : ""}
+      </div>` : ""}
+      <details><summary>${escapeHtml(t.where)} : ${escapeHtml(t.occurrences(group.pages, group.elements))}</summary>
+        <ul>${group.occurrences.map((occurrence) => `<li>${escapeHtml(occurrence.page)}${occurrence.targets.length ? ` — <code>${occurrence.targets.map(escapeHtml).join("</code>, <code>")}</code>` : ""}</li>`).join("")}</ul>
+      </details>
+    </article>`).join("");
+
+  const criteria = result.criteria ?? [];
+  const list = (outcome) =>
+    criteria
+      .filter((line) => line.outcome === outcome)
+      .map((line) => `<li><strong>${escapeHtml(line.criterion)}</strong> ${escapeHtml(line.title)}</li>`)
+      .join("");
+  const passed = list("passed");
+  const review = list("review");
+
+  return `
+  <p class="intro">${escapeHtml(t.learningIntro)}</p>
+  <section class="grid" aria-labelledby="fix-heading">
+    <h2 id="fix-heading">${escapeHtml(t.toFix)}</h2>
+    ${cards || `<div class="card"><p>${escapeHtml(t.noIssues)}</p></div>`}
+  </section>
+  ${passed ? `<section class="card good" aria-labelledby="good-heading"><h2 id="good-heading">${escapeHtml(t.goingWell)}</h2><ul>${passed}</ul></section>` : ""}
+  ${review ? `<section class="card" aria-labelledby="review-heading"><h2 id="review-heading">${escapeHtml(t.toCheckByHand)}</h2><ul>${review}</ul></section>` : ""}
+  <p class="note">${escapeHtml(t.criteriaNote(result.rgaaVersion ?? "4.1.2"))}</p>`;
 }
 
 export function renderHtml(result) {
@@ -118,12 +163,17 @@ tbody th { font-weight: 400; }
 .outcome-failed td:nth-child(3) { color: #9f1239; font-weight: 700; }
 .outcome-review td:nth-child(3) { color: #9a3412; }
 .note { color: #475569; font-size: 14px; }
+.intro { background: #eef6ff; border: 1px solid #bfdbfe; border-radius: 16px; padding: 14px 18px; }
+.lesson dt { font-weight: 700; margin-top: 10px; }
+.lesson dd { margin: 4px 0 0; }
+.criterion-line { color: #334155; }
+.good { margin-top: 18px; border-color: #bbf7d0; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 @media (max-width: 860px) { .kpis { grid-template-columns: repeat(2, minmax(120px, 1fr)); } }
 </style>
 </head>
 <body>
-<div class="wrap">
+<main class="wrap">
   <header>
     <h1>${escapeHtml(t.reportTitle)}</h1>
     <p><strong>${escapeHtml(t.target)}:</strong> ${escapeHtml(result.target)}</p>
@@ -136,13 +186,13 @@ tbody th { font-weight: 400; }
     <div class="kpi"><div class="value">${Number(result.summary.pagesScanned)}</div><div>${escapeHtml(t.pagesScanned)}</div></div>
     ${["critical", "major", "minor", "info"].map((severity) => `<div class="kpi"><div class="value">${Number(counts[severity])}</div><div>${escapeHtml(severityLabel(t, severity).replace(/^./, (c) => c.toUpperCase()))}</div></div>`).join("\n    ")}
   </section>
-${renderCriteria(result, t)}
+${result.mode === "learning" ? renderLearningBody(result, t) : `${renderCriteria(result, t)}
   <section class="grid" aria-labelledby="issues-heading">
     <h2 id="issues-heading" class="sr-only">${escapeHtml(t.issues)}</h2>
     ${issueCards || `<div class="card"><p>${escapeHtml(t.noIssues)}</p></div>`}
-    ${result.pageErrors?.length ? `<article class="card"><h2>${escapeHtml(t.pagesNotScanned)}</h2><ul>${result.pageErrors.map((error) => `<li>${escapeHtml(error.page)}: ${escapeHtml(error.message)}</li>`).join("")}</ul></article>` : ""}
-  </section>
-</div>
+  </section>`}
+  ${result.pageErrors?.length ? `<section class="card"><h2>${escapeHtml(t.pagesNotScanned)}</h2><ul>${result.pageErrors.map((error) => `<li>${escapeHtml(error.page)}: ${escapeHtml(error.message)}</li>`).join("")}</ul></section>` : ""}
+</main>
 </body>
 </html>`;
 }

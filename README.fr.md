@@ -152,7 +152,7 @@ npx astro-a11y report --input reports/report.json --format html --output reports
 | --- | --- | --- |
 | `balanced` | Scan par défaut | Non (CLI) · seulement avec `failOnBuild: true` (intégration) |
 | `strict` | Même scan, seuil plus exigeant | Oui, dès les problèmes `major` |
-| `learning` | Rapport seul, pour les ateliers et les premiers audits | Jamais |
+| `learning` | Rapport seul, pour les ateliers et les premiers audits : problèmes regroupés par sujet, avec qui est gêné et comment le constater soi-même | Jamais |
 | `paranoid` | Scans distants avec les garde-fous les plus stricts (pas de redirection, ports sensibles bloqués, rapports nettoyés) | Non |
 
 Un seuil explicite l'emporte toujours : `--fail-on <sévérité>` (CLI) ou `failOn` (intégration), avec `critical`, `major`, `minor` ou `info`. Un mode ou un seuil invalide est refusé avec une erreur au lieu d'être ignoré en silence.
@@ -164,6 +164,18 @@ Un seuil explicite l'emporte toujours : `--fail-on <sévérité>` (CLI) ou `fail
 `--lang fr` (CLI), `lang: 'fr'` (intégration) ou `lang: fr` (Action) écrivent les problèmes et les rapports en français.
 
 Chaque rapport se termine par une **vue par critère** : pour chaque critère concerné par les règles exécutées, *Problèmes détectés*, *À vérifier à la main* (axe n'a pas pu trancher), *Aucun problème détecté* ou *Non applicable*. *Aucun problème détecté* veut seulement dire que les tests automatiques n'ont rien trouvé : la plupart des critères demandent aussi une vérification humaine.
+
+## Mode pédagogique (ateliers)
+
+`--mode learning --lang fr` transforme le rapport en support d'atelier, pour une association, une petite mairie ou une équipe non technique :
+
+- un sujet par règle, les plus graves d'abord, expliqué simplement ;
+- **qui est gêné** (personnes aveugles avec un lecteur d'écran, personnes qui naviguent au clavier, personnes malvoyantes…) ;
+- **le constater soi-même** : une manière simple de vivre le problème (écran en niveaux de gris, clavier seul, lecteur d'écran gratuit…) ;
+- la correction avec un exemple avant/après, et toutes les pages et éléments concernés ;
+- ce qui fonctionne déjà, et ce qui reste à vérifier à la main.
+
+Il ne fait jamais échouer un build. Le rapport HTML est lui-même vérifié avec axe-core dans les tests.
 
 ## Tests clavier
 

@@ -31,7 +31,13 @@ function sanitizeIssue(issue, options) {
     after: options.safeReport ? undefined : issue.after ? clip(issue.after, options.maxFieldLength) : undefined,
     help: issue.help ? clip(issue.help, options.maxFieldLength) : undefined,
     helpUrl: issue.helpUrl ? clip(issue.helpUrl, options.maxFieldLength) : undefined,
-    nodes: Array.isArray(issue.nodes) ? issue.nodes.map((node) => sanitizeNode(node, options)) : []
+    nodes: Array.isArray(issue.nodes) ? issue.nodes.map((node) => sanitizeNode(node, options)) : [],
+    learn: issue.learn
+      ? {
+          who: Array.isArray(issue.learn.who) ? issue.learn.who.map((who) => clip(who, options.maxFieldLength)) : [],
+          tryIt: clip(issue.learn.tryIt, options.maxFieldLength)
+        }
+      : undefined
   };
 }
 

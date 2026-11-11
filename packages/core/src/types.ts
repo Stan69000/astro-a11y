@@ -21,6 +21,8 @@ export interface EnrichedViolation {
   rgaa: string;
   /** Official title of the RGAA criterion (absent for "manual-check"). */
   rgaaTitle?: string;
+  /** Learning mode only: who is affected and how to experience the problem. */
+  learn?: { who: string[]; tryIt: string };
   page: string;
   severity: Severity;
   title: string;

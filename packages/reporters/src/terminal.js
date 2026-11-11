@@ -30,6 +30,8 @@ export function renderTerminal(result) {
     lines.push(`${t.page}: ${issue.page}`);
     lines.push(`${t.rule}: ${issue.id}`);
     if (issue.howToFix) lines.push(`${t.fix}: ${issue.howToFix}`);
+    if (issue.learn?.who?.length) lines.push(`${t.whoIsAffected}: ${issue.learn.who.join(" ; ")}`);
+    if (issue.learn?.tryIt) lines.push(`${t.tryIt}: ${issue.learn.tryIt}`);
     if (issue.nodes?.length) {
       const firstNode = issue.nodes[0];
       if (firstNode.target) lines.push(`${t.element}: ${firstNode.target}`);

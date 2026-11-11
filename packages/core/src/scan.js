@@ -8,6 +8,7 @@ import { enrichViolation, RGAA_VERSION } from './mappings.js';
 import { launchChromium } from './browser.js';
 import { KEYBOARD_RULES, runKeyboardChecks } from './keyboard.js';
 import { buildCriteriaView, recordAxeOutcomes, recordOutcome } from './criteria.js';
+import { lessonFor } from './pedagogy.js';
 import { discoverSitemapUrls } from './sitemap.js';
 
 const DEFAULT_TIMEOUT_MS = 15000;
@@ -84,6 +85,14 @@ function pageContext(options, securityOptions, ruleOutcomes) {
 
 /** Common shape of every scan result. */
 function buildResult({ target, options, issues, pagesScanned, ruleOutcomes, ...extra }) {
+  const lang = options.lang ?? 'en';
+  // The learning mode adds plain-language explanations for workshops and first audits.
+  if (options.mode === 'learning') {
+    issues = issues.map((issue) => {
+      const learn = lessonFor(issue.rgaa, lang);
+      return learn ? { ...issue, learn } : issue;
+    });
+  }
   return {
     target,
     mode: options.mode ?? 'balanced',

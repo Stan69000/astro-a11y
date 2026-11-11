@@ -14,6 +14,7 @@ export {
 } from './mappings.js';
 export { AXE_RULES } from './axe-rules.js';
 export { buildCriteriaView, OUTCOME_ORDER } from './criteria.js';
+export { LESSONS, lessonFor } from './pedagogy.js';
 export {
   RGAA_CRITERIA,
   RGAA_TOPICS,
