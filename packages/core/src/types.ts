@@ -19,6 +19,8 @@ export interface AxeNode {
 export interface EnrichedViolation {
   id: string;
   rgaa: string;
+  /** Official title of the RGAA criterion (absent for "manual-check"). */
+  rgaaTitle?: string;
   page: string;
   severity: Severity;
   title: string;

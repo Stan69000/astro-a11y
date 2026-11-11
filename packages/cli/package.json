@@ -1,7 +1,7 @@
 {
   "name": "astro-a11y",
   "version": "0.1.0",
-  "description": "Accessibility guardrails for Astro sites and static builds: axe-core scans with RGAA 4.1 mapping.",
+  "description": "Accessibility guardrails for Astro sites and static builds: axe-core scans with RGAA 4.1.2 mapping.",
   "keywords": [
     "accessibility",
     "a11y",

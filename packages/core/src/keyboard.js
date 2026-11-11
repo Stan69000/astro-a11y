@@ -13,6 +13,8 @@
  * a coherent tab order (RGAA 12.8) needs a human judgement.
  */
 
+import { criterionTitle } from './rgaa.js';
+
 export const KEYBOARD_RULES = Object.freeze({
   'keyboard-trap': {
     rgaa: '12.9',
@@ -112,6 +114,7 @@ function makeIssue(ruleId, page, mode, nodes) {
   return {
     id: ruleId,
     rgaa: rule.rgaa,
+    rgaaTitle: criterionTitle(rule.rgaa),
     page,
     severity: rule.severity,
     title: rule.title,

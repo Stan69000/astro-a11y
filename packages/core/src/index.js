@@ -5,7 +5,14 @@ export {
   isUnsafeHostname,
   resolveSafeRemoteUrl
 } from './security.js';
-export { enrichViolation, mapAxeToRgaa, RGAA_VERSION } from './mappings.js';
+export { enrichViolation, mapAxeToRgaa } from './mappings.js';
+export {
+  RGAA_CRITERIA,
+  RGAA_TOPICS,
+  RGAA_VERSION,
+  criterionTitle,
+  criterionTopic
+} from './rgaa.js';
 export {
   collectHtmlRoutesFromDirectory,
   htmlFileToRoute,
