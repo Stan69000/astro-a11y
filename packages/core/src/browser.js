@@ -41,6 +41,17 @@ export function installChromium({ withDeps = false } = {}) {
  */
 export function explainLaunchError(error) {
   const message = error instanceof Error ? error.message : String(error);
+  if (message.includes('Chromium sandboxing failed')) {
+    return new Error(
+      'The paranoid mode requires the Chromium sandbox, which this system cannot provide. ' +
+        'Usual causes: running as root, or unprivileged user namespaces blocked (Ubuntu 23.10+ ' +
+        'restricts them with AppArmor: check `cat /proc/sys/kernel/apparmor_restrict_unprivileged_userns`, ' +
+        '1 means blocked). Fixes: run as a regular user, allow the Chromium binary with an AppArmor ' +
+        'profile, or on a disposable CI runner `sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0`. ' +
+        'Otherwise use another mode inside an isolated container.',
+      { cause: error }
+    );
+  }
   if (!message.includes("Executable doesn't exist")) return error;
   return new Error(
     'Chromium for Playwright is not installed. Run `npx astro-a11y install-browser`, ' +

@@ -9,11 +9,10 @@ import { launchChromium } from './browser.js';
 import { KEYBOARD_RULES, runKeyboardChecks } from './keyboard.js';
 import { buildCriteriaView, recordAxeOutcomes, recordOutcome } from './criteria.js';
 import { lessonFor } from './pedagogy.js';
+import { installNetworkGuard } from './network-guard.js';
 import { discoverSitemapUrls } from './sitemap.js';
 
 const DEFAULT_TIMEOUT_MS = 15000;
-const isCI = process.env.CI === 'true';
-
 function isUrl(target) {
   return /^https?:\/\//i.test(target);
 }
@@ -27,9 +26,13 @@ function normalizeRoutes(routes) {
   return Array.from(new Set(routes.map(withLeadingSlash)));
 }
 
-function resolveLaunchArgs(options = {}) {
-  if (options.enforceSandbox === true) return [];
-  return isCI ? ['--no-sandbox', '--disable-setuid-sandbox'] : [];
+/**
+ * Playwright starts Chromium without its OS sandbox unless `chromiumSandbox` is set.
+ * The paranoid mode turns it on and fails closed when the system cannot provide it
+ * (e.g. running as root, or user namespaces disabled) instead of scanning unsandboxed.
+ */
+function launchOptions(options = {}) {
+  return { headless: true, chromiumSandbox: options.enforceSandbox === true };
 }
 
 function getSecurityOptions(options = {}) {
@@ -154,12 +157,10 @@ export async function scanRemoteUrl(url, options = {}) {
   const securityOptions = getSecurityOptions(options);
   const resolvedUrl = await resolveSafeRemoteUrl(url, securityOptions);
 
-  const browser = await launchChromium({
-    headless: true,
-    args: resolveLaunchArgs(options)
-  });
+  const browser = await launchChromium(launchOptions(options));
   try {
     const context = await browser.newContext();
+    const guard = await installNetworkGuard(context, { securityOptions });
     const page = await context.newPage();
     const ruleOutcomes = new Map();
     const issues = await scanPage(
@@ -168,7 +169,14 @@ export async function scanRemoteUrl(url, options = {}) {
       pageContext(options, securityOptions, ruleOutcomes)
     );
 
-    return buildResult({ target: resolvedUrl, options, issues, pagesScanned: 1, ruleOutcomes });
+    return buildResult({
+      target: resolvedUrl,
+      options,
+      issues,
+      pagesScanned: 1,
+      ruleOutcomes,
+      blockedRequests: guard.blocked
+    });
   } finally {
     await browser.close();
   }
@@ -189,12 +197,10 @@ export async function scanSitemap(siteUrl, options = {}) {
     sitemapUrl: options.sitemapUrl
   });
 
-  const browser = await launchChromium({
-    headless: true,
-    args: resolveLaunchArgs(options)
-  });
+  const browser = await launchChromium(launchOptions(options));
   try {
     const context = await browser.newContext();
+    const guard = await installNetworkGuard(context, { securityOptions });
     const page = await context.newPage();
     const issues = [];
     const pageErrors = [];
@@ -226,7 +232,8 @@ export async function scanSitemap(siteUrl, options = {}) {
       ruleOutcomes,
       routes: urls,
       sitemaps,
-      pageErrors
+      pageErrors,
+      blockedRequests: guard.blocked
     });
   } finally {
     await browser.close();
@@ -240,13 +247,15 @@ export async function scanDirectory(rootDir, options = {}) {
   const progress = options.onProgress;
   const routes = await resolveDirectoryRoutes(rootDir, options.routes);
   const server = await startStaticServer(rootDir);
-  const browser = await launchChromium({
-    headless: true,
-    args: resolveLaunchArgs(options)
-  });
+  const browser = await launchChromium(launchOptions(options));
 
   try {
     const context = await browser.newContext();
+    // A built site may reference anything; only the local server and public hosts are reachable.
+    const guard = await installNetworkGuard(context, {
+      securityOptions: getSecurityOptions(options),
+      allowOrigins: [new URL(server.baseUrl).origin]
+    });
     const page = await context.newPage();
     const issues = [];
     const ruleOutcomes = new Map();
@@ -269,7 +278,8 @@ export async function scanDirectory(rootDir, options = {}) {
       issues,
       pagesScanned: routes.length,
       ruleOutcomes,
-      routes
+      routes,
+      blockedRequests: guard.blocked
     });
   } finally {
     await browser.close();
