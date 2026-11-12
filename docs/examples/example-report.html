@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="astro-a11y-report">
 <title>astro-a11y report</title>
 <style>
 body { font-family: Inter, system-ui, sans-serif; margin: 0; background: #f5f7fb; color: #172033; }
@@ -19,21 +20,37 @@ header { padding: 20px; margin-bottom: 18px; }
 .badge-major { background: #fff7ed; color: #9a3412; }
 .badge-minor { background: #eff6ff; color: #1d4ed8; }
 .badge-info { background: #ecfeff; color: #155e75; }
+.badge-new { background: #172033; color: #ffffff; }
 .example { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-top: 12px; }
 pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #0f172a; color: #e2e8f0; padding: 12px; border-radius: 12px; }
 .node { border-top: 1px solid #e5e7eb; padding-top: 12px; margin-top: 12px; }
 details summary { cursor: pointer; font-weight: 600; }
 a { color: #1d4ed8; }
+.criteria { margin-bottom: 18px; }
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 8px; border-bottom: 1px solid #e5e7eb; vertical-align: top; }
+tbody th { font-weight: 400; }
+.criterion { font-weight: 700; }
+.outcome-failed td:nth-child(3) { color: #9f1239; font-weight: 700; }
+.outcome-review td:nth-child(3) { color: #9a3412; }
+.note { color: #475569; font-size: 14px; }
+.intro { background: #eef6ff; border: 1px solid #bfdbfe; border-radius: 16px; padding: 14px 18px; }
+.lesson dt { font-weight: 700; margin-top: 10px; }
+.lesson dd { margin: 4px 0 0; }
+.criterion-line { color: #334155; }
+.good { margin-top: 18px; border-color: #bbf7d0; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 @media (max-width: 860px) { .kpis { grid-template-columns: repeat(2, minmax(120px, 1fr)); } }
 </style>
 </head>
 <body>
-<div class="wrap">
+<main class="wrap">
   <header>
     <h1>astro-a11y report</h1>
-    <p><strong>Target:</strong> /Users/stanbouchet/astro-a11y/examples/static-site/dist</p>
-    <p><strong>Mode:</strong> learning · <strong>Generated:</strong> 2026-04-19T12:02:04.910Z</p>
+    <p><strong>Target:</strong> ./examples/static-site/site</p>
+    <p><strong>Mode:</strong> learning · <strong>Generated:</strong> 2026-11-12T06:37:58.683Z</p>
+    
   </header>
 
   <section class="kpis" aria-labelledby="summary-heading">
@@ -45,155 +62,148 @@ a { color: #1d4ed8; }
     <div class="kpi"><div class="value">0</div><div>Info</div></div>
   </section>
 
-  <section class="grid" aria-labelledby="issues-heading">
-    <h2 id="issues-heading" class="sr-only">Issues</h2>
+  <p class="intro">Learning mode: issues are grouped by topic and explained in plain words. Start with the critical ones, then try each problem yourself: it is the best way to understand it.</p>
+  <section class="grid" aria-labelledby="fix-heading">
+    <h2 id="fix-heading">What to fix</h2>
     
-    <article class="card">
-      <div class="badge badge-major">MAJOR</div>
-      <h2>Document has no title</h2>
-      <p><strong>Page:</strong> http://127.0.0.1:56615/contact/</p>
-      <p><strong>Rule:</strong> document-title · <strong>RGAA:</strong> 8.5</p>
-      <p><strong>Why:</strong> A meaningful page title helps users understand where they are.</p>
-      <p><strong>Fix:</strong> Ensure each page has a descriptive title element.</p>
-      
-      <details><summary>Affected nodes</summary>
-        <div class="node">
-          <p><strong>Target:</strong> html</p>
-          <p><strong>Failure:</strong> Fix any of the following:
-  Document does not have a non-empty &lt;title&gt; element</p>
-          
-        </div></details>
-      <p><a href="https://dequeuniversity.com/rules/axe/4.11/document-title?application=playwright" target="_blank" rel="noopener noreferrer" aria-label="Rule documentation (opens in new tab)">Rule documentation</a></p>
-    </article>
-  
-    <article class="card">
-      <div class="badge badge-major">MAJOR</div>
-      <h2>HTML element has no lang attribute</h2>
-      <p><strong>Page:</strong> http://127.0.0.1:56615/contact/</p>
-      <p><strong>Rule:</strong> html-has-lang · <strong>RGAA:</strong> 8.3</p>
-      <p><strong>Why:</strong> Assistive technologies need the page language to pronounce content correctly.</p>
-      <p><strong>Fix:</strong> Set the lang attribute on the root html element.</p>
-      
-      <details><summary>Affected nodes</summary>
-        <div class="node">
-          <p><strong>Target:</strong> html</p>
-          <p><strong>Failure:</strong> Fix any of the following:
-  The &lt;html&gt; element does not have a lang attribute</p>
-          
-        </div></details>
-      <p><a href="https://dequeuniversity.com/rules/axe/4.11/html-has-lang?application=playwright" target="_blank" rel="noopener noreferrer" aria-label="Rule documentation (opens in new tab)">Rule documentation</a></p>
-    </article>
-  
-    <article class="card">
+    <article class="card lesson">
       <div class="badge badge-critical">CRITICAL</div>
-      <h2>Form control is missing a label</h2>
-      <p><strong>Page:</strong> http://127.0.0.1:56615/contact/</p>
-      <p><strong>Rule:</strong> label · <strong>RGAA:</strong> 11.1</p>
-      <p><strong>Why:</strong> Form fields without labels are difficult or impossible to understand with assistive technologies.</p>
-      <p><strong>Fix:</strong> Associate a visible or programmatic label with each form control.</p>
+      <h3>1. Form control is missing a label</h3>
+      <p class="criterion-line">RGAA <strong>11.1</strong> — Chaque champ de formulaire a-t-il une étiquette ?</p>
+      <dl>
+        <dt>Why</dt><dd>Form fields without labels are difficult or impossible to understand with assistive technologies.</dd>
+        <dt>Who is affected</dt><dd><ul><li>Blind people using a screen reader</li><li>People using voice control</li><li>People with attention or cognitive disorders</li></ul></dd>
+        <dt>See it for yourself</dt><dd>Click on the text next to the field: if the cursor does not move into the field, the label is not linked.</dd>
+        <dt>Fix</dt><dd>Associate a visible or programmatic label with each form control.</dd>
+      </dl>
       
-      <details><summary>Affected nodes</summary>
-        <div class="node">
-          <p><strong>Target:</strong> #email</p>
-          <p><strong>Failure:</strong> Fix any of the following:
-  Element does not have an implicit (wrapped) &lt;label&gt;
-  Element does not have an explicit &lt;label&gt;
-  aria-label attribute does not exist or is empty
-  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty
-  Element has no title attribute
-  Element has no placeholder attribute
-  Element&#39;s default semantics were not overridden with role=&quot;none&quot; or role=&quot;presentation&quot;</p>
-          
-        </div></details>
-      <p><a href="https://dequeuniversity.com/rules/axe/4.11/label?application=playwright" target="_blank" rel="noopener noreferrer" aria-label="Rule documentation (opens in new tab)">Rule documentation</a></p>
+      <div class="example">
+        <div><strong>Before</strong><pre>&lt;input id=&quot;email&quot; type=&quot;email&quot;&gt;</pre></div>
+        <div><strong>After</strong><pre>&lt;label for=&quot;email&quot;&gt;Email&lt;/label&gt;&lt;input id=&quot;email&quot; type=&quot;email&quot;&gt;</pre></div>
+      </div>
+      <details><summary>Where : 1 page(s), 1 element(s)</summary>
+        <ul><li>/contact/ — <code>input</code></li></ul>
+      </details>
     </article>
-  
-    <article class="card">
+    <article class="card lesson">
       <div class="badge badge-critical">CRITICAL</div>
-      <h2>Button has no accessible name</h2>
-      <p><strong>Page:</strong> http://127.0.0.1:56615/</p>
-      <p><strong>Rule:</strong> button-name · <strong>RGAA:</strong> 11.9</p>
-      <p><strong>Why:</strong> Assistive technologies cannot announce the purpose of the button.</p>
-      <p><strong>Fix:</strong> Add visible text, aria-label, or an accessible name linked to the button.</p>
+      <h3>2. Button has no accessible name</h3>
+      <p class="criterion-line">RGAA <strong>11.9</strong> — Dans chaque formulaire, l’intitulé de chaque bouton est-il pertinent (hors cas particuliers) ?</p>
+      <dl>
+        <dt>Why</dt><dd>Assistive technologies cannot announce the purpose of the button.</dd>
+        <dt>Who is affected</dt><dd><ul><li>Blind people using a screen reader</li><li>People using voice control</li></ul></dd>
+        <dt>See it for yourself</dt><dd>Turn on the screen reader of your device (VoiceOver: Cmd+F5 on Mac; NVDA, free, on Windows) and listen to the element.</dd>
+        <dt>Fix</dt><dd>Add visible text, aria-label, or an accessible name linked to the button.</dd>
+      </dl>
       
-      <details><summary>Affected nodes</summary>
-        <div class="node">
-          <p><strong>Target:</strong> button</p>
-          <p><strong>Failure:</strong> Fix any of the following:
-  Element does not have inner text that is visible to screen readers
-  aria-label attribute does not exist or is empty
-  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty
-  Element has no title attribute
-  Element does not have an implicit (wrapped) &lt;label&gt;
-  Element does not have an explicit &lt;label&gt;
-  Element&#39;s default semantics were not overridden with role=&quot;none&quot; or role=&quot;presentation&quot;</p>
-          
-        </div></details>
-      <p><a href="https://dequeuniversity.com/rules/axe/4.11/button-name?application=playwright" target="_blank" rel="noopener noreferrer" aria-label="Rule documentation (opens in new tab)">Rule documentation</a></p>
+      <div class="example">
+        <div><strong>Before</strong><pre>&lt;button&gt;&lt;svg aria-hidden=&quot;true&quot;&gt;&lt;/svg&gt;&lt;/button&gt;</pre></div>
+        <div><strong>After</strong><pre>&lt;button aria-label=&quot;Close dialog&quot;&gt;&lt;svg aria-hidden=&quot;true&quot;&gt;&lt;/svg&gt;&lt;/button&gt;</pre></div>
+      </div>
+      <details><summary>Where : 1 page(s), 1 element(s)</summary>
+        <ul><li>/ — <code>button</code></li></ul>
+      </details>
     </article>
-  
-    <article class="card">
+    <article class="card lesson">
       <div class="badge badge-major">MAJOR</div>
-      <h2>Insufficient color contrast</h2>
-      <p><strong>Page:</strong> http://127.0.0.1:56615/</p>
-      <p><strong>Rule:</strong> color-contrast · <strong>RGAA:</strong> 3.2</p>
-      <p><strong>Why:</strong> Low contrast makes text difficult to read for many users, including people with low vision.</p>
-      <p><strong>Fix:</strong> Increase the contrast ratio between foreground and background colors.</p>
+      <h3>3. Document has no title</h3>
+      <p class="criterion-line">RGAA <strong>8.5</strong> — Chaque page web a-t-elle un titre de page ?</p>
+      <dl>
+        <dt>Why</dt><dd>A meaningful page title helps users understand where they are.</dd>
+        <dt>Who is affected</dt><dd><ul><li>Blind people using a screen reader</li><li>People with attention or cognitive disorders</li></ul></dd>
+        <dt>See it for yourself</dt><dd>Open several tabs: can you tell which tab is this page?</dd>
+        <dt>Fix</dt><dd>Ensure each page has a descriptive title element.</dd>
+      </dl>
       
-      <details><summary>Affected nodes</summary>
-        <div class="node">
-          <p><strong>Target:</strong> .muted</p>
-          <p><strong>Failure:</strong> Fix any of the following:
-  Element has insufficient color contrast of 1.24 (foreground color: #888888, background color: #999999, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1</p>
-          
-        </div></details>
-      <p><a href="https://dequeuniversity.com/rules/axe/4.11/color-contrast?application=playwright" target="_blank" rel="noopener noreferrer" aria-label="Rule documentation (opens in new tab)">Rule documentation</a></p>
+      <div class="example">
+        <div><strong>Before</strong><pre>&lt;title&gt;&lt;/title&gt;</pre></div>
+        <div><strong>After</strong><pre>&lt;title&gt;Contact – Example Company&lt;/title&gt;</pre></div>
+      </div>
+      <details><summary>Where : 1 page(s), 1 element(s)</summary>
+        <ul><li>/contact/ — <code>html</code></li></ul>
+      </details>
     </article>
-  
-    <article class="card">
+    <article class="card lesson">
       <div class="badge badge-major">MAJOR</div>
-      <h2>Iframe has no title</h2>
-      <p><strong>Page:</strong> http://127.0.0.1:56615/</p>
-      <p><strong>Rule:</strong> frame-title · <strong>RGAA:</strong> 2.1</p>
-      <p><strong>Why:</strong> Users need a clear title to understand embedded content.</p>
-      <p><strong>Fix:</strong> Add a concise and meaningful title attribute to the iframe.</p>
+      <h3>4. HTML element has no lang attribute</h3>
+      <p class="criterion-line">RGAA <strong>8.3</strong> — Dans chaque page web, la langue par défaut est-elle présente ?</p>
+      <dl>
+        <dt>Why</dt><dd>Assistive technologies need the page language to pronounce content correctly.</dd>
+        <dt>Who is affected</dt><dd><ul><li>Blind people using a screen reader</li></ul></dd>
+        <dt>See it for yourself</dt><dd>Listen to the page with a screen reader: is the French read with an English accent?</dd>
+        <dt>Fix</dt><dd>Set the lang attribute on the root html element.</dd>
+      </dl>
       
-      <details><summary>Affected nodes</summary>
-        <div class="node">
-          <p><strong>Target:</strong> iframe</p>
-          <p><strong>Failure:</strong> Fix any of the following:
-  Element has no title attribute
-  aria-label attribute does not exist or is empty
-  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty
-  Element&#39;s default semantics were not overridden with role=&quot;none&quot; or role=&quot;presentation&quot;</p>
-          
-        </div></details>
-      <p><a href="https://dequeuniversity.com/rules/axe/4.11/frame-title?application=playwright" target="_blank" rel="noopener noreferrer" aria-label="Rule documentation (opens in new tab)">Rule documentation</a></p>
+      <div class="example">
+        <div><strong>Before</strong><pre>&lt;html&gt;</pre></div>
+        <div><strong>After</strong><pre>&lt;html lang=&quot;fr&quot;&gt;</pre></div>
+      </div>
+      <details><summary>Where : 1 page(s), 1 element(s)</summary>
+        <ul><li>/contact/ — <code>html</code></li></ul>
+      </details>
     </article>
-  
-    <article class="card">
+    <article class="card lesson">
       <div class="badge badge-major">MAJOR</div>
-      <h2>Alternative text missing on image</h2>
-      <p><strong>Page:</strong> http://127.0.0.1:56615/</p>
-      <p><strong>Rule:</strong> image-alt · <strong>RGAA:</strong> 1.1</p>
-      <p><strong>Why:</strong> Screen reader users cannot understand the purpose of the image.</p>
-      <p><strong>Fix:</strong> Add a meaningful alt attribute, or alt=&quot;&quot; for decorative images.</p>
+      <h3>5. Insufficient color contrast</h3>
+      <p class="criterion-line">RGAA <strong>3.2</strong> — Dans chaque page web, le contraste entre la couleur du texte et la couleur de son arrière-plan est-il suffisamment élevé (hors cas particuliers) ?</p>
+      <dl>
+        <dt>Why</dt><dd>Low contrast makes text difficult to read for many users, including people with low vision.</dd>
+        <dt>Who is affected</dt><dd><ul><li>People with low vision</li><li>Everyone, on a phone or in bright sunlight</li></ul></dd>
+        <dt>See it for yourself</dt><dd>Read the page on your phone outdoors, or lower the screen brightness.</dd>
+        <dt>Fix</dt><dd>Increase the contrast ratio between foreground and background colors.</dd>
+      </dl>
       
-      <details><summary>Affected nodes</summary>
-        <div class="node">
-          <p><strong>Target:</strong> img</p>
-          <p><strong>Failure:</strong> Fix any of the following:
-  Element does not have an alt attribute
-  aria-label attribute does not exist or is empty
-  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty
-  Element has no title attribute
-  Element&#39;s default semantics were not overridden with role=&quot;none&quot; or role=&quot;presentation&quot;</p>
-          
-        </div></details>
-      <p><a href="https://dequeuniversity.com/rules/axe/4.11/image-alt?application=playwright" target="_blank" rel="noopener noreferrer" aria-label="Rule documentation (opens in new tab)">Rule documentation</a></p>
+      <div class="example">
+        <div><strong>Before</strong><pre>.muted { color: #777; background: #888; }</pre></div>
+        <div><strong>After</strong><pre>.muted { color: #1f2937; background: #ffffff; }</pre></div>
+      </div>
+      <details><summary>Where : 1 page(s), 1 element(s)</summary>
+        <ul><li>/ — <code>p</code></li></ul>
+      </details>
     </article>
-  
+    <article class="card lesson">
+      <div class="badge badge-major">MAJOR</div>
+      <h3>6. Iframe has no title</h3>
+      <p class="criterion-line">RGAA <strong>2.1</strong> — Chaque cadre a-t-il un titre de cadre ?</p>
+      <dl>
+        <dt>Why</dt><dd>Users need a clear title to understand embedded content.</dd>
+        <dt>Who is affected</dt><dd><ul><li>Blind people using a screen reader</li></ul></dd>
+        <dt>See it for yourself</dt><dd>Turn on the screen reader of your device (VoiceOver: Cmd+F5 on Mac; NVDA, free, on Windows) and listen to the element.</dd>
+        <dt>Fix</dt><dd>Add a concise and meaningful title attribute to the iframe.</dd>
+      </dl>
+      
+      <div class="example">
+        <div><strong>Before</strong><pre>&lt;iframe src=&quot;https://example.com/embed&quot;&gt;&lt;/iframe&gt;</pre></div>
+        <div><strong>After</strong><pre>&lt;iframe src=&quot;https://example.com/embed&quot; title=&quot;Video player&quot;&gt;&lt;/iframe&gt;</pre></div>
+      </div>
+      <details><summary>Where : 1 page(s), 1 element(s)</summary>
+        <ul><li>/ — <code>iframe</code></li></ul>
+      </details>
+    </article>
+    <article class="card lesson">
+      <div class="badge badge-major">MAJOR</div>
+      <h3>7. Alternative text missing on image</h3>
+      <p class="criterion-line">RGAA <strong>1.1</strong> — Chaque image porteuse d’information a-t-elle une alternative textuelle ?</p>
+      <dl>
+        <dt>Why</dt><dd>Screen reader users cannot understand the purpose of the image.</dd>
+        <dt>Who is affected</dt><dd><ul><li>Blind people using a screen reader</li></ul></dd>
+        <dt>See it for yourself</dt><dd>Disable images in your browser (or read the page with a screen reader): is the information still there?</dd>
+        <dt>Fix</dt><dd>Add a meaningful alt attribute, or alt=&quot;&quot; for decorative images.</dd>
+      </dl>
+      
+      <div class="example">
+        <div><strong>Before</strong><pre>&lt;img src=&quot;/team.jpg&quot;&gt;</pre></div>
+        <div><strong>After</strong><pre>&lt;img src=&quot;/team.jpg&quot; alt=&quot;Team gathered in the Lyon office&quot;&gt;</pre></div>
+      </div>
+      <details><summary>Where : 1 page(s), 1 element(s)</summary>
+        <ul><li>/ — <code>img</code></li></ul>
+      </details>
+    </article>
   </section>
-</div>
+  <section class="card good" aria-labelledby="good-heading"><h2 id="good-heading">What already works (automated checks)</h2><ul><li><strong>1.3</strong> Pour chaque image porteuse d’information ayant une alternative textuelle, cette alternative est-elle pertinente (hors cas particuliers) ?</li><li><strong>7.1</strong> Chaque script est-il, si nécessaire, compatible avec les technologies d’assistance ?</li><li><strong>8.4</strong> Pour chaque page web ayant une langue par défaut, le code de langue est-il pertinent ?</li><li><strong>9.1</strong> Dans chaque page web, l’information est-elle structurée par l’utilisation appropriée de titres ?</li><li><strong>9.2</strong> Dans chaque page web, la structure du document est-elle cohérente (hors cas particuliers) ?</li><li><strong>10.4</strong> Dans chaque page web, le texte reste-t-il lisible lorsque la taille des caractères est augmentée jusqu’à 200 %, au moins (hors cas particuliers) ?</li><li><strong>10.7</strong> Dans chaque page web, pour chaque élément recevant le focus, la prise de focus est-elle visible ?</li><li><strong>12.6</strong> Les zones de regroupement de contenus présentes dans plusieurs pages web (zones d’en-tête, de navigation principale, de contenu principal, de pied de page et de moteur de recherche) peuvent-elles être atteintes ou évitées ?</li><li><strong>12.9</strong> Dans chaque page web, la navigation ne doit pas contenir de piège au clavier. Cette règle est-elle respectée ?</li></ul></section>
+  <section class="card" aria-labelledby="review-heading"><h2 id="review-heading">To check by hand</h2><ul><li><strong>12.7</strong> Dans chaque page web, un lien d’évitement ou d’accès rapide à la zone de contenu principal est-il présent (hors cas particuliers) ?</li></ul></section>
+  <p class="note">RGAA 4.1.2. Automated checks only: &quot;No issue detected&quot; does not mean compliant, most criteria also need a manual check.</p>
+  
+</main>
 </body>
 </html>

@@ -2,12 +2,13 @@
 
 [English](./README.md) | Français
 
+[![npm](https://img.shields.io/npm/v/astro-a11y)](https://www.npmjs.com/package/astro-a11y)
 [![Node.js Version](https://img.shields.io/node/v/astro-a11y)](https://nodejs.org)
 [![RGAA Version](https://img.shields.io/badge/RGAA-4.1.2-green)](https://accessibilite.numerique.gouv.fr/)
 
 Garde-fous d’accessibilité pour les projets Astro. Porté par [Le Singe du Numérique](https://lesingedunumerique.fr).
 
-> **Pas encore publié sur npm.** Les commandes `pnpm add` / `npx` ci-dessous fonctionneront une fois les paquets publiés (voir [RELEASING.md](./RELEASING.md)). En attendant : clonez ce dépôt, lancez `pnpm install && pnpm build`, puis utilisez `node packages/cli/dist/bin.js` ou importez `packages/astro-integration/dist/index.js`.
+> **Sur npm :** [`@astro-a11y/astro-integration`](https://www.npmjs.com/package/@astro-a11y/astro-integration) (intégration Astro) et [`astro-a11y`](https://www.npmjs.com/package/astro-a11y) (CLI). Chaque version est publiée par GitHub Actions, avec la provenance npm (voir [RELEASING.md](./RELEASING.md)).
 
 Les scans tournent dans Chromium via Playwright. Installez le navigateur correspondant une fois par machine avec `npx astro-a11y install-browser` (en CI Linux : `npx astro-a11y install-browser --with-deps`).
 
