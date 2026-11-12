@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-12
+
 ### Security
 
 - Network guard: every request of the scanning browser (subresources, fetch, WebSockets) is checked against the remote-target rules, so a scanned page cannot reach private addresses or metadata endpoints. Blocked URLs are listed in `blockedRequests`.
@@ -15,35 +17,26 @@ All notable changes to this project will be documented in this file.
 
 - Learning mode reports (`--mode learning`): issues grouped by rule, explained in plain words, with who is affected and how to experience the problem yourself (lessons for the 34 criteria checked, in English and French), plus what already works and what to check by hand.
 - The HTML report is now accessible itself (`<main>` landmark) and checked with axe-core in the e2e tests.
-
-### Fixed
-
-- HTML tags in explanations (`<label for>`, `<marquee>`…) are escaped in Markdown reports instead of being interpreted by Markdown renderers.
-
 - RGAA mapping extended from 17 to 87 axe-core rules (images, frames, colors, media, tables, links, ARIA, mandatory elements, structure, presentation, forms, navigation, consultation), each with English and French texts. Unmapped rules take their severity from axe's impact.
 - `--lang fr` / `lang: 'fr'` / Action `lang` input: issue texts and every report format in French.
 - Per-criterion view in every report (`criteria` in JSON): outcome of each RGAA criterion touched by the rules that ran (issues found, to check manually, no issue detected, not applicable), with counts and worst severity.
 - `rgaaVersion` and `lang` in scan results.
-
 - RGAA reference shared with rgaa-audit (RGAA 4.1.2, 13 topics, official titles of the 106 criteria): issues now carry `rgaaTitle`, `RGAA_VERSION` is `4.1.2`, a test checks that every mapped criterion exists, `scripts/sync-rgaa-reference.js` and a weekly drift check keep the copy identical to rgaa-audit's.
-
 - Keyboard checks with real key presses: keyboard trap (RGAA 12.9), invisible focus (RGAA 10.7), broken skip link (RGAA 12.7). On by default; `--no-keyboard`, `keyboard: false` or the Action's `keyboard` input turn them off. Real-browser tests in `pnpm test:e2e` and a CI job.
-
 - `--sitemap [url]` and `--max-pages <n>`: scan every page of a deployed site from its sitemaps (robots.txt, `/sitemap-index.xml`, `/sitemap.xml`, sitemap indexes), same-host only, with the remote security guards on every request. Unreachable pages are reported (`pageErrors`) and fail a gated run. Also `sitemap` / `max-pages` inputs in the GitHub Action.
 - Pages answering HTTP 4xx/5xx are reported as errors instead of being scanned as content.
-
 - Baselines: `--write-baseline <file>` records known issues, `--baseline <file>` marks new issues and makes the failure threshold count only them (also `baseline` option in the integration).
 - `github` report format: compact Markdown for pull request comments and job summaries (`--report-url` links the full report).
 - GitHub Action (`action.yml`): scan, sticky pull request comment, job summary, report artifact, baseline-aware failure.
-
 - `astro-a11y install-browser [--with-deps]` downloads the Chromium build matching the bundled Playwright; a missing browser now fails with this command in the error message.
 - Release workflow (`.github/workflows/release.yml`): npm trusted publishing (OIDC, no stored token) with provenance; `scripts/check-release.js` and `RELEASING.md`.
 - npm metadata on every package (license, repository, homepage, engines, README, LICENSE).
 
 ### Fixed
 
+- `astro-a11y --version` reads the installed package version (it always printed 0.1.0).
+- HTML tags in explanations (`<label for>`, `<marquee>`…) are escaped in Markdown reports instead of being interpreted by Markdown renderers.
 - HTML reports written by astro-a11y are no longer scanned as pages when a build directory is scanned again.
-
 - Astro integration no longer crashes on dynamic routes (`[slug].astro`, `[...path].astro`): pages are resolved from the files Astro generated (`assets` map), and endpoints, redirects and on-demand pages are skipped.
 - `summary.pagesScanned` now counts every scanned page, not only pages with issues.
 - RGAA 4.1 mapping corrected against the official reference: `input-image-alt` → 1.1, `link-name` → 6.2, `dlitem` → 9.3, `aria-valid-attr` / `aria-roles` / `focus-order-semantics` → 7.1, `region` → 12.6.

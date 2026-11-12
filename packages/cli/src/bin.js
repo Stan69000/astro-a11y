@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
 import { readFile } from 'node:fs/promises';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 import {
   SUPPORTED_LANGS,
@@ -20,6 +21,9 @@ import {
 import { renderByFormat } from '@astro-a11y/reporters';
 import { writeOutput } from './output-path.js';
 
+// Read from the published manifest so `--version` always matches the release.
+const { version } = createRequire(import.meta.url)('../package.json');
+
 function exitWithError(message) {
   process.stderr.write(`Error: ${message}\n`);
   process.exit(1);
@@ -30,7 +34,7 @@ const program = new Command();
 program
   .name('astro-a11y')
   .description('Accessibility guardrails for Astro projects.')
-  .version('0.1.0');
+  .version(version);
 
 program
   .command('check')
