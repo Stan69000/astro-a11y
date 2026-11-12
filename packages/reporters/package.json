@@ -1,6 +1,6 @@
 {
   "name": "@astro-a11y/reporters",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Terminal, JSON, HTML and Markdown reporters for astro-a11y.",
   "keywords": [
     "accessibility",
