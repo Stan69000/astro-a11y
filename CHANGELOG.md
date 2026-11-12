@@ -4,9 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-## [0.2.1] - 2026-11-12
+## [0.2.2] - 2026-11-12
 
-First release published by the GitHub Actions release workflow (npm trusted publishing, with provenance). The published packages' code is unchanged from 0.2.0.
+First release published by the GitHub Actions release workflow (npm trusted publishing, with provenance). The published packages' code is unchanged from 0.2.0. It contains the changes listed under 0.2.1.
+
+## [0.2.1] - 2026-11-12 [NOT PUBLISHED]
+
+Never published to npm: the release workflow failed before uploading anything (see "Fixed" below). Its changes ship in 0.2.2.
 
 ### Fixed
 
