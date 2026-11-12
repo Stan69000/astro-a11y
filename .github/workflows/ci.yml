@@ -41,6 +41,15 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
       - run: node packages/cli/dist/bin.js install-browser --with-deps
+      # Ubuntu 23.10+ blocks unprivileged user namespaces with AppArmor, which the
+      # Chromium sandbox needs. The runner is disposable, so lift the restriction
+      # here; the paranoid-mode e2e test then checks the real sandbox.
+      - name: Allow the Chromium sandbox (AppArmor userns restriction)
+        run: |
+          knob=/proc/sys/kernel/apparmor_restrict_unprivileged_userns
+          if [ -f "$knob" ] && [ "$(cat "$knob")" = "1" ]; then
+            sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+          fi
       - run: pnpm test:e2e
 
   action:
