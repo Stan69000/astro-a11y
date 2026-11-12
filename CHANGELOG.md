@@ -7,7 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Security
 
 - Network guard: every request of the scanning browser (subresources, fetch, WebSockets) is checked against the remote-target rules, so a scanned page cannot reach private addresses or metadata endpoints. Blocked URLs are listed in `blockedRequests`.
-- `--mode paranoid` now really enables Chromium's OS sandbox (Playwright disables it by default) and fails closed when it is unavailable.
+- `--mode paranoid` now really enables Chromium's OS sandbox (Playwright disables it by default) and fails closed when it is unavailable. The error explains the Ubuntu 23.10+ AppArmor restriction on user namespaces and how to lift it.
 - The local static server refuses symbolic links that point outside the build directory (they were served before) and encoded traversal; it sends `nosniff` and correct types for fonts and modern images.
 - Workflows: checkout credentials no longer persisted, no dependency cache in releases, exact npm version for publishing, Dependabot cooldown of 7 days, CodeQL and zizmor analysis.
 

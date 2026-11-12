@@ -38,7 +38,7 @@ This tool is intentionally designed to reduce attack surface:
 
 - `--allow-unsafe-targets` weakens SSRF protections and should only be used in trusted test environments.
 - For external or untrusted scan targets, run `astro-a11y` from an isolated VM/container with constrained network egress.
-- Use `--mode paranoid` for high-risk scans: Chromium's OS sandbox enabled (the scan fails instead of running unsandboxed when the system cannot provide it, e.g. as root), redirects disabled, sensitive ports blocked, safe report output. In other modes, as with Playwright's default, Chromium runs without its OS sandbox.
+- Use `--mode paranoid` for high-risk scans: Chromium's OS sandbox enabled (the scan fails instead of running unsandboxed when the system cannot provide it, e.g. as root, or on Ubuntu 23.10+ where AppArmor blocks unprivileged user namespaces: the error message explains the fixes), redirects disabled, sensitive ports blocked, safe report output. In other modes, as with Playwright's default, Chromium runs without its OS sandbox.
 
 ## Known limitations
 

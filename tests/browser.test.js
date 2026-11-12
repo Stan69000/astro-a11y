@@ -19,6 +19,14 @@ test('explains a missing browser with an actionable command', () => {
   assert.equal(explained.cause, original);
 });
 
+test('explains a sandbox failure, including the Ubuntu AppArmor restriction', () => {
+  const original = new Error('browserType.launch: Chromium sandboxing failed!');
+  const explained = explainLaunchError(original);
+  assert.match(explained.message, /paranoid mode requires the Chromium sandbox/);
+  assert.match(explained.message, /apparmor_restrict_unprivileged_userns/);
+  assert.equal(explained.cause, original);
+});
+
 test('leaves unrelated launch errors untouched', () => {
   const original = new Error('Target page, context or browser has been closed');
   assert.equal(explainLaunchError(original), original);
