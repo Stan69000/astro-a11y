@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Astro a11y | Accessibilité Astro, concrète et fiable</title>
+    <title>Astro a11y — audit d'accessibilité RGAA pour sites Astro</title>
     <meta
       name="description"
-      content="Astro a11y est un toolkit open source pour renforcer l'accessibilité des sites Astro: scan Playwright + axe, recommandations actionnables, rapports HTML/JSON/Markdown."
+      content="Outil open source qui audite l'accessibilité de vos sites Astro selon le RGAA 4.1.2 : 87 règles, tests clavier, rapports en français et GitHub Action."
     />
     <meta name="robots" content="index,follow,max-image-preview:large" />
     <meta name="author" content="Stan Bouchet" />
@@ -14,20 +14,28 @@
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="fr_FR" />
     <meta property="og:site_name" content="Astro a11y" />
-    <meta property="og:title" content="Astro a11y | Accessibilité Astro, concrète et fiable" />
+    <meta property="og:title" content="Astro a11y — audit d'accessibilité RGAA pour sites Astro" />
     <meta
       property="og:description"
-      content="Scannez vos pages Astro avec Playwright + axe, obtenez des recommandations actionnables et des rapports partageables."
+      content="Outil open source qui audite l'accessibilité de vos sites Astro selon le RGAA 4.1.2 : 87 règles, tests clavier, rapports en français et GitHub Action."
     />
     <meta property="og:url" content="https://stan69000.github.io/astro-a11y/" />
-    <meta property="og:image" content="https://stan69000.github.io/astro-a11y/examples/example-report.png" />
+    <meta property="og:image" content="https://stan69000.github.io/astro-a11y/og-image.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Astro a11y : audit d'accessibilité RGAA automatique pour vos sites Astro" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Astro a11y | Accessibilité Astro, concrète et fiable" />
+    <meta name="twitter:title" content="Astro a11y — audit d'accessibilité RGAA pour sites Astro" />
     <meta
       name="twitter:description"
-      content="Toolkit open source Astro-first pour intégrer l'accessibilité dans le build et la CI."
+      content="Outil open source qui audite l'accessibilité de vos sites Astro selon le RGAA 4.1.2 : 87 règles, tests clavier, rapports en français et GitHub Action."
     />
-    <meta name="twitter:image" content="https://stan69000.github.io/astro-a11y/examples/example-report.png" />
+    <meta name="twitter:image" content="https://stan69000.github.io/astro-a11y/og-image.png" />
+    <meta name="twitter:image:alt" content="Astro a11y : audit d'accessibilité RGAA automatique pour vos sites Astro" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="./icon-192.png" type="image/png" sizes="192x192" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
     <meta name="theme-color" content="#eef5f1" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#0f1715" media="(prefers-color-scheme: dark)" />
     <link rel="stylesheet" href="./site.css" />
@@ -37,7 +45,19 @@
         "@type": "SoftwareApplication",
         "name": "Astro a11y",
         "applicationCategory": "DeveloperApplication",
-        "operatingSystem": "Cross-platform",
+        "operatingSystem": "Linux, macOS, Windows (Node.js 20+)",
+        "inLanguage": "fr",
+        "isAccessibleForFree": true,
+        "image": "https://stan69000.github.io/astro-a11y/og-image.png",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+        "featureList": [
+          "87 règles axe-core reliées aux critères RGAA 4.1.2",
+          "Tests clavier : piège au clavier, focus visible, lien d'évitement",
+          "Rapports HTML, JSON, Markdown en français ou en anglais",
+          "Baseline et GitHub Action avec commentaire de pull request",
+          "Analyse d'un site entier via son sitemap",
+          "Mode pédagogique pour les ateliers"
+        ],
         "url": "https://stan69000.github.io/astro-a11y/",
         "codeRepository": "https://github.com/Stan69000/astro-a11y",
         "license": "https://github.com/Stan69000/astro-a11y/blob/main/LICENSE",
@@ -47,7 +67,7 @@
           "name": "Le Singe du Numérique",
           "url": "https://lesingedunumerique.fr"
         },
-        "description": "Toolkit Astro-first pour scanner l'accessibilité web avec Playwright + axe et produire des rapports actionnables."
+        "description": "Outil open source qui audite l'accessibilité de vos sites Astro selon le RGAA 4.1.2 : 87 règles, tests clavier, rapports en français et GitHub Action."
       }
     </script>
   </head>
@@ -59,6 +79,7 @@
         <a class="brand" href="#top">Astro a11y</a>
         <ul>
           <li><a href="#public">Grand public</a></li>
+          <li><a href="#fonctionnalites">Fonctionnalités</a></li>
           <li><a href="#dev">Développeurs</a></li>
           <li><a href="#difference">Différence</a></li>
           <li><a href="#preuve">Preuves</a></li>
@@ -71,7 +92,7 @@
       </nav>
 
       <section class="wrap hero__content">
-        <p class="eyebrow">Boîte à outils open source pour Astro</p>
+        <p class="eyebrow">Audit d'accessibilité RGAA open source pour Astro</p>
         <h1>L'accessibilité web devient un réflexe dans votre cycle de build</h1>
         <p class="lead">
           <strong>Astro a11y</strong> scanne vos pages rendues avec Playwright + axe,
@@ -82,7 +103,7 @@
           <a class="btn btn--primary" href="https://github.com/Stan69000/astro-a11y">Voir le dépôt GitHub</a>
           <a class="btn btn--ghost" href="#demarrage">Installer en 2 minutes</a>
         </div>
-        <ul class="trust-list" aria-label="Points clés">
+        <ul class="trust-list">
           <li>Local-first et sans télémétrie</li>
           <li>Rapports pour experts et non-tech</li>
           <li>Compatible CLI et intégration Astro</li>
@@ -115,6 +136,39 @@
         <figure class="figure">
           <img src="./assets/illustration-audiences.svg" alt="" aria-hidden="true" />
         </figure>
+      </section>
+
+      <section class="section wrap" id="fonctionnalites">
+        <div class="section__head">
+          <p class="eyebrow">Fonctionnalités</p>
+          <h2>Ce que l'audit vérifie et produit</h2>
+        </div>
+        <div class="grid grid--3">
+          <article class="card">
+            <h3>87 règles reliées au RGAA 4.1.2</h3>
+            <p>Images, couleurs, liens, formulaires, ARIA, structure, navigation… Chaque problème indique le critère RGAA concerné, pourquoi il gêne et comment le corriger.</p>
+          </article>
+          <article class="card">
+            <h3>Tests au clavier</h3>
+            <p>Les pages sont parcourues avec la touche Tab : pièges au clavier, focus invisible et lien d'évitement cassé sont détectés.</p>
+          </article>
+          <article class="card">
+            <h3>Rapports en français</h3>
+            <p>Rapports HTML, Markdown et JSON, avec une vue par critère RGAA. Le rapport HTML est lui-même vérifié accessible.</p>
+          </article>
+          <article class="card">
+            <h3>Dans votre CI</h3>
+            <p>Intégration Astro, CLI et GitHub Action qui commente vos pull requests. Avec une baseline, seuls les nouveaux problèmes font échouer le build.</p>
+          </article>
+          <article class="card">
+            <h3>Un site entier</h3>
+            <p>Analyse d'un dossier de build ou d'un site en ligne à partir de son sitemap, avec des garde-fous contre les requêtes vers des adresses privées.</p>
+          </article>
+          <article class="card">
+            <h3>Mode pédagogique</h3>
+            <p>Pour les ateliers : qui est gêné, comment constater le problème soi-même, et ce qui fonctionne déjà.</p>
+          </article>
+        </div>
       </section>
 
       <section class="section section--alt" id="dev">
