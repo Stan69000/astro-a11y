@@ -73,8 +73,10 @@ jobs:
           name: tarballs
           path: tarballs
       # Dependencies first, so installs never resolve a missing version.
+      # The "./" prefix matters: npm reads "tarballs/<file>" as a GitHub
+      # "user/repo" shorthand and tries to clone it instead of publishing the file.
       - name: Publish to npm
         run: |
           for pkg in astro-a11y-core astro-a11y-reporters astro-a11y-astro-integration astro-a11y; do
-            npm publish "tarballs/${pkg}-${GITHUB_REF_NAME#v}.tgz" --access public --ignore-scripts
+            npm publish "./tarballs/${pkg}-${GITHUB_REF_NAME#v}.tgz" --access public --ignore-scripts
           done

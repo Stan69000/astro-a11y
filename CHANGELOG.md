@@ -8,6 +8,10 @@ All notable changes to this project will be documented in this file.
 
 First release published by the GitHub Actions release workflow (npm trusted publishing, with provenance). The published packages' code is unchanged from 0.2.0.
 
+### Fixed
+
+- Release workflow: tarballs are published by relative path (`./tarballs/…`); npm took `tarballs/<file>` for a GitHub repository and the first automated publish failed before uploading anything.
+
 ### Security
 
 - Development tooling: `minimatch` forced to 11.0.1 or later (GHSA-g3hv-75wg-m249, CPU exhaustion with a crafted glob). It came in through ESLint only and was never part of the published packages.
