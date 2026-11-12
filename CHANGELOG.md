@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-11-12
+
+First release published by the GitHub Actions release workflow (npm trusted publishing, with provenance). The published packages' code is unchanged from 0.2.0.
+
+### Security
+
+- Development tooling: `minimatch` forced to 11.0.1 or later (GHSA-g3hv-75wg-m249, CPU exhaustion with a crafted glob). It came in through ESLint only and was never part of the published packages.
+
 ## [0.2.0] - 2026-11-12
 
 ### Security

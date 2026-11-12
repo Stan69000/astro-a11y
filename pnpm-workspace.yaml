@@ -1,3 +1,9 @@
 packages:
   - packages/*
   - examples/*
+
+# Security (GHSA-g3hv-75wg-m249): minimatch < 11.0.1 can be made to use
+# excessive CPU with a crafted glob. ESLint (dev only) still pins ^10;
+# remove this override once ESLint depends on minimatch 11.
+overrides:
+  minimatch@<11.0.1: '>=11.0.1 <12'
