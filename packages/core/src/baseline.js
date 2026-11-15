@@ -30,7 +30,7 @@ function hash(value) {
   return createHash('sha256').update(value).digest('hex').slice(0, 20);
 }
 
-const ASTRO_SCOPE = /\[data-astro-cid-[a-z0-9]+(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\]]*))?\]|\.astro-[a-z0-9]{8}\b/gi;
+const ASTRO_SCOPE = /\[data-astro-cid-[a-z0-9]+(?:="[^"]*"|='[^']*'|=[^\]"'\s]*)?\]|\.astro-[a-z0-9]{8}\b/gi;
 
 /** CSS target without the scoping hashes Astro generates per component. */
 export function stableTarget(target) {
