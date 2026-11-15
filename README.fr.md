@@ -201,7 +201,7 @@ astro-a11y check ./dist --mode strict --baseline a11y-baseline.json
 
 Avec une baseline, les rapports signalent les nouveaux problèmes et comptent les éléments corrigés depuis, et le seuil d'échec ne compte que les nouveaux problèmes. L'intégration Astro accepte le même fichier : `astroA11y({ mode: 'strict', baseline: 'a11y-baseline.json' })` (chemin relatif à la racine du projet).
 
-Un problème est identifié par la règle axe, le chemin de la page et le sélecteur CSS de l'élément. Si le code autour d'un élément change, son sélecteur peut changer aussi : il apparaît alors comme corrigé + nouveau.
+Un problème est identifié par la règle axe, le chemin de la page et le sélecteur CSS de l'élément, sans les hash de portée qu'ajoute Astro (`[data-astro-cid-…]`), qui changent à chaque modification d'un composant. Si le code autour d'un élément change, son sélecteur peut changer aussi : il apparaît alors comme corrigé + nouveau.
 
 ## GitHub Action
 

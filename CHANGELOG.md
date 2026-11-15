@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+
+- Scanning a build directory no longer crashes on redirect pages (`Execution context was destroyed`): pages that only redirect with `<meta http-equiv="refresh">`, like the ones Astro writes for `redirects` in a static build, are skipped. A page that still cannot be scanned (HTTP error, navigation during the analysis) is listed in `pageErrors` and the other pages are scanned, as with `--sitemap`. The Astro integration now fails a gated build when a page could not be scanned, like the CLI.
+- No more false `keyboard-trap` (critical) and `keyboard-focus-visible` on widgets that keep their focusable content in a closed shadow root, such as Cloudflare Turnstile: the page only sees the host element while Tab moves inside it, as with an iframe.
+- Stable results from one run to the next: before axe runs, the scan waits (3 s at most) for the load event, web fonts and finite CSS animations. Elements caught mid fade-in gave varying `color-contrast` results on the same build.
+- Baseline fingerprints ignore the scoping hashes Astro adds to selectors (`[data-astro-cid-…]`, `.astro-…`), which change whenever a component changes. Baselines written by 0.2.2 are still recognised.
+
 ## [0.2.2] - 2026-11-12
 
 First release published by the GitHub Actions release workflow (npm trusted publishing, with provenance). The published packages' code is unchanged from 0.2.0. It contains the changes listed under 0.2.1.

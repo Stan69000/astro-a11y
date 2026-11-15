@@ -119,6 +119,15 @@ export default function astroA11y(options = {}) {
           logger.info(`reports written to ${reportDir}`);
         }
 
+        for (const pageError of result.pageErrors ?? []) {
+          logger.warn(`could not scan ${pageError.page}: ${pageError.message}`);
+        }
+        // A page that could not be scanned must not let a gated build pass silently.
+        if (failThreshold !== null && result.pageErrors?.length > 0) {
+          throw new Error(
+            `[astro-a11y] Build failed: ${result.pageErrors.length} page(s) could not be scanned.`
+          );
+        }
         if (hasIssuesAtOrAbove(result.summary, failThreshold)) {
           throw new Error(
             `[astro-a11y] Build failed: accessibility issues at or above "${failThreshold}" were found.`

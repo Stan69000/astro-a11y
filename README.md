@@ -176,7 +176,7 @@ astro-a11y check ./dist --mode strict --baseline a11y-baseline.json
 
 With a baseline, reports mark new issues and count the elements fixed since the baseline, and the failure threshold only counts new issues. The Astro integration accepts the same file: `astroA11y({ mode: 'strict', baseline: 'a11y-baseline.json' })` (path relative to the project root).
 
-An issue is identified by axe rule + page path + CSS selector of the element. If the markup around an element changes, its selector can change too, and it then shows up as fixed + new.
+An issue is identified by axe rule + page path + CSS selector of the element, without the scoping hashes Astro adds (`[data-astro-cid-…]`), which change with every edit of a component. If the markup around an element changes, its selector can change too, and it then shows up as fixed + new.
 
 ## GitHub Action
 

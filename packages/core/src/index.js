@@ -26,6 +26,7 @@ export {
   collectHtmlRoutesFromDirectory,
   htmlFileToRoute,
   isGeneratedReport,
+  isRedirectPage,
   REPORT_GENERATOR
 } from './routes.js';
 export { startStaticServer } from './static-server.js';
