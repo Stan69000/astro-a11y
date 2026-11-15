@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.2.3] - 2026-11-15
+
 ### Fixed
 
 - Scanning a build directory no longer crashes on redirect pages (`Execution context was destroyed`): pages that only redirect with `<meta http-equiv="refresh">`, like the ones Astro writes for `redirects` in a static build, are skipped. A page that still cannot be scanned (HTTP error, navigation during the analysis) is listed in `pageErrors` and the other pages are scanned, as with `--sitemap`. The Astro integration now fails a gated build when a page could not be scanned, like the CLI.
