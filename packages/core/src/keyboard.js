@@ -186,7 +186,12 @@ async function describe(handle) {
     target: window.__astroA11yKeyboard.selector(el),
     html: el.outerHTML.slice(0, 300),
     isBody: el === document.body || el === document.documentElement || el === null,
-    isFrame: el.localName === 'iframe' || el.localName === 'frame'
+    // Focus is inside a frame, or inside a closed shadow root (e.g. Cloudflare Turnstile):
+    // the page only sees the host, which Tab could not reach on its own (tabIndex -1).
+    isEmbedded:
+      el.localName === 'iframe' ||
+      el.localName === 'frame' ||
+      (el.tabIndex < 0 && el.shadowRoot === null && el !== document.body)
   }));
 }
 
@@ -231,8 +236,8 @@ export async function runKeyboardChecks(page, url, mode, { lang = 'en' } = {}) {
 
     const index = visited.findIndex((entry) => entry.info.uid === info.uid);
     if (index !== -1) {
-      // Focus moving inside a frame keeps the frame as the active element of this page.
-      if (info.isFrame) {
+      // Focus moving inside a frame or a closed shadow root keeps its host as the active element.
+      if (info.isEmbedded) {
         await handle.dispose();
         continue;
       }
@@ -270,7 +275,7 @@ export async function runKeyboardChecks(page, url, mode, { lang = 'en' } = {}) {
   await page.evaluate(() => document.activeElement?.blur?.());
   const invisible = [];
   for (const entry of visited) {
-    if (entry.outline || entry.info.isFrame) continue;
+    if (entry.outline || entry.info.isEmbedded) continue;
     const unfocusedStyle = await entry.handle.evaluate((el) =>
       window.__astroA11yKeyboard.snapshot(el)
     );

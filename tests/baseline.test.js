@@ -86,3 +86,38 @@ test('baseline files are stable and validated', () => {
   );
   assert.throws(() => parseBaseline('{"version":1,"fingerprints":[1]}'), /array of strings/);
 });
+
+test('ignores the scoping hashes Astro adds to selectors', () => {
+  const before = resultWith([
+    issue('color-contrast', 'http://x/', [
+      '.nav > li[data-astro-cid-fzpbxy5g=""]:nth-child(1) > a[href$="blog/"][data-astro-cid-fzpbxy5g=""]',
+      'p.astro-j7pv25f6'
+    ])
+  ]);
+  // Same elements after a change in the component: Astro generated new hashes.
+  const after = resultWith([
+    issue('color-contrast', 'http://x/', [
+      '.nav > li[data-astro-cid-0a1b2c3d=""]:nth-child(1) > a[href$="blog/"][data-astro-cid-0a1b2c3d=""]',
+      'p.astro-k8qw36g7'
+    ])
+  ]);
+  const applied = applyBaseline(after, createBaseline(before));
+  assert.equal(applied.issues[0].isNew, false);
+  assert.equal(applied.summary.baseline.fixedElements, 0);
+});
+
+test('still recognises the issues of a baseline written by 0.2.2', async () => {
+  const { createHash } = await import('node:crypto');
+  const target = 'li[data-astro-cid-fzpbxy5g=""] > a';
+  const legacy = createHash('sha256')
+    .update(['color-contrast', '/', target].join('\u0000'))
+    .digest('hex')
+    .slice(0, 20);
+  const baseline = { version: 1, fingerprints: [legacy] };
+  const applied = applyBaseline(
+    resultWith([issue('color-contrast', 'http://127.0.0.1:4000/', [target])]),
+    baseline
+  );
+  assert.equal(applied.issues[0].isNew, false);
+  assert.equal(applied.summary.baseline.fixedElements, 0);
+});

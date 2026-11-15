@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><title>Widget fermé</title></head>
+<body><main><h1>Titre</h1><a href="/a">Avant</a>
+<div id="widget"></div>
+<a href="/b">Après</a><a href="/c">Encore</a><a href="/d">Fin</a></main>
+<script>
+  // Comme le widget Cloudflare Turnstile : une iframe dans une racine fantôme fermée.
+  const root = document.getElementById('widget').attachShadow({ mode: 'closed' });
+  root.innerHTML = '<iframe title="Vérification" srcdoc="<!doctype html><html lang=\'fr\'><body><input aria-label=\'x\'><input aria-label=\'y\'></body></html>"></iframe><button>Un</button><button>Deux</button>';
+</script></body></html>

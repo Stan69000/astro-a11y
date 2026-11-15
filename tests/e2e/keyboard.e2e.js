@@ -73,6 +73,10 @@ test('focus moving inside an iframe is not a trap', async () => {
   assert.deepEqual(ids(await check('iframe.html')), []);
 });
 
+test('focus moving inside a closed shadow root is not a trap', async () => {
+  assert.deepEqual(ids(await check('closed-shadow.html')), []);
+});
+
 test('reports outcomes per rule and French texts', async () => {
   const page = await browser.newPage();
   try {

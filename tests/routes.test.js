@@ -45,6 +45,45 @@ test("skips HTML reports previously written by astro-a11y", async () => {
   }
 });
 
+test("skips redirect pages written with a meta refresh", async () => {
+  const tempRoot = await mkdtemp(path.join(os.tmpdir(), "astro-a11y-routes-"));
+  try {
+    await writeFile(path.join(tempRoot, "index.html"), "<!doctype html><html><body>home</body></html>", "utf8");
+    await mkdir(path.join(tempRoot, "projets"), { recursive: true });
+    // The page Astro writes for `redirects: { '/projets': '/asso' }` in a static build.
+    await writeFile(
+      path.join(tempRoot, "projets", "index.html"),
+      '<!doctype html><title>Redirecting to: /asso/</title><meta http-equiv="refresh" content="0;url=/asso/"><meta name="robots" content="noindex"><body><a href="/asso/">Redirecting</a></body>',
+      "utf8"
+    );
+    await mkdir(path.join(tempRoot, "lexique-seo"), { recursive: true });
+    await writeFile(
+      path.join(tempRoot, "lexique-seo", "index.html"),
+      "<!doctype html><html><head><META HTTP-EQUIV=Refresh CONTENT='2;url=/lexique/'></head><body>x</body></html>",
+      "utf8"
+    );
+
+    const routes = await collectHtmlRoutesFromDirectory(tempRoot);
+    assert.deepEqual(routes, ["/"]);
+  } finally {
+    await rm(tempRoot, { recursive: true, force: true });
+  }
+});
+
+test("keeps pages that only mention refresh outside a meta refresh", async () => {
+  const tempRoot = await mkdtemp(path.join(os.tmpdir(), "astro-a11y-routes-"));
+  try {
+    await writeFile(
+      path.join(tempRoot, "index.html"),
+      '<!doctype html><html><head><meta name="description" content="refresh your password"></head><body>http-equiv refresh</body></html>',
+      "utf8"
+    );
+    assert.deepEqual(await collectHtmlRoutesFromDirectory(tempRoot), ["/"]);
+  } finally {
+    await rm(tempRoot, { recursive: true, force: true });
+  }
+});
+
 test("core and reporters agree on the report marker", () => {
   assert.equal(CORE_REPORT_GENERATOR, REPORTER_REPORT_GENERATOR);
 });

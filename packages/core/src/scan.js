@@ -1,3 +1,4 @@
+/* global document, requestAnimationFrame -- settlePage runs its callback in the browser */
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import AxeBuilder from '@axe-core/playwright';
@@ -109,6 +110,39 @@ function buildResult({ target, options, issues, pagesScanned, ruleOutcomes, ...e
   };
 }
 
+const SETTLE_TIMEOUT_MS = 3000;
+
+/**
+ * Lets the page reach its resting state before axe reads colours: an element caught
+ * mid fade-in has a blended colour, so the same build gave different contrast results
+ * from one run to the next. Waits (each step capped) for the load event, web fonts and
+ * the finite CSS animations and transitions; infinite ones are left running.
+ *
+ * @param {import('playwright').Page} page
+ */
+async function settlePage(page) {
+  await page.waitForLoadState('load', { timeout: SETTLE_TIMEOUT_MS }).catch(() => {});
+  await page
+    .evaluate(async (timeout) => {
+      const deadline = new Promise((resolve) => setTimeout(resolve, timeout));
+      const finite = () =>
+        document
+          .getAnimations()
+          .filter((animation) => {
+            const timing = animation.effect?.getComputedTiming?.();
+            return animation.playState === 'running' && Number.isFinite(timing?.endTime);
+          })
+          .map((animation) => animation.finished.catch(() => {}));
+      await Promise.race([
+        Promise.all([document.fonts?.ready, ...finite()]),
+        deadline
+      ]);
+      // Two frames so that styles set at the end of an animation are applied.
+      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    }, SETTLE_TIMEOUT_MS)
+    .catch(() => {});
+}
+
 /**
  * @param {import('playwright').Page} page
  * @param {string} url
@@ -132,6 +166,8 @@ async function scanPage(
     }
     await assertAllowedRemoteTarget(finalUrl, securityOptions);
   }
+
+  await settlePage(page);
 
   let builder = new AxeBuilder({ page });
 
@@ -240,6 +276,10 @@ export async function scanSitemap(siteUrl, options = {}) {
   }
 }
 
+/**
+ * Scans every HTML page of a build directory.
+ * A page that cannot be scanned is recorded in `pageErrors` instead of aborting the scan.
+ */
 export async function scanDirectory(rootDir, options = {}) {
   const stat = await fs.stat(rootDir);
   if (!stat.isDirectory()) throw new Error(`Target is not a directory: ${rootDir}`);
@@ -256,29 +296,43 @@ export async function scanDirectory(rootDir, options = {}) {
       securityOptions: getSecurityOptions(options),
       allowOrigins: [new URL(server.baseUrl).origin]
     });
-    const page = await context.newPage();
+    let page = await context.newPage();
     const issues = [];
+    const pageErrors = [];
     const ruleOutcomes = new Map();
+    let pagesScanned = 0;
 
     for (let i = 0; i < routes.length; i++) {
       const route = routes[i];
       if (progress) progress({ current: i + 1, total: routes.length, route });
       const url = new URL(route, server.baseUrl).toString();
-      const pageIssues = await scanPage(
-        page,
-        url,
-        pageContext(options, getSecurityOptions(options), ruleOutcomes)
-      );
-      issues.push(...pageIssues);
+      try {
+        const pageIssues = await scanPage(
+          page,
+          url,
+          pageContext(options, getSecurityOptions(options), ruleOutcomes)
+        );
+        issues.push(...pageIssues);
+        pagesScanned += 1;
+      } catch (error) {
+        // e.g. a page that navigates away during the analysis: record it and go on.
+        pageErrors.push({
+          page: route,
+          message: error instanceof Error ? error.message : String(error)
+        });
+        await page.close().catch(() => {});
+        page = await context.newPage();
+      }
     }
 
     return buildResult({
       target: path.resolve(rootDir),
       options,
       issues,
-      pagesScanned: routes.length,
+      pagesScanned,
       ruleOutcomes,
       routes,
+      ...(pageErrors.length > 0 ? { pageErrors } : {}),
       blockedRequests: guard.blocked
     });
   } finally {

@@ -7,6 +7,8 @@ import { createHash } from 'node:crypto';
  * An issue is identified per affected element: axe rule + page path + CSS
  * target. The page is reduced to its path so that the random port of the
  * local static server, or a preview hostname, does not change the identity.
+ * The scoping hashes Astro adds to selectors (`[data-astro-cid-…]`, `.astro-…`) are
+ * removed first: they change whenever a component changes, while the element stays.
  * Limitation: a target selector that changes (DOM reshuffle) counts as new.
  */
 
@@ -28,15 +30,34 @@ function hash(value) {
   return createHash('sha256').update(value).digest('hex').slice(0, 20);
 }
 
+// Astro writes these attributes empty; bounded lengths keep the pattern linear.
+const ASTRO_SCOPE = /\[data-astro-cid-[a-z0-9]{1,16}(?:=""|='')?\]|\.astro-[a-z0-9]{8}\b/gi;
+
+/** CSS target without the scoping hashes Astro generates per component. */
+export function stableTarget(target) {
+  return target.replace(ASTRO_SCOPE, '');
+}
+
+function targetText(node) {
+  return Array.isArray(node?.target) ? node.target.join(' ') : String(node?.target ?? '');
+}
+
 export function nodeFingerprint(issue, node) {
-  const target = Array.isArray(node?.target) ? node.target.join(' ') : String(node?.target ?? '');
-  return hash([issue.id, pageKey(issue.page), target].join('\u0000'));
+  return hash([issue.id, pageKey(issue.page), stableTarget(targetText(node))].join('\u0000'));
+}
+
+/** Fingerprint written by astro-a11y 0.2.2 and earlier, with the Astro hashes kept. */
+function legacyNodeFingerprint(issue, node) {
+  return hash([issue.id, pageKey(issue.page), targetText(node)].join('\u0000'));
+}
+
+function issueNodes(issue) {
+  return Array.isArray(issue.nodes) && issue.nodes.length > 0 ? issue.nodes : [{}];
 }
 
 /** Fingerprints of every element affected by an issue (one when no node is reported). */
 export function issueFingerprints(issue) {
-  const nodes = Array.isArray(issue.nodes) && issue.nodes.length > 0 ? issue.nodes : [{}];
-  return nodes.map((node) => nodeFingerprint(issue, node));
+  return issueNodes(issue).map((node) => nodeFingerprint(issue, node));
 }
 
 /**
@@ -89,13 +110,19 @@ export function applyBaseline(result, baseline) {
   const newIssuesBySeverity = Object.fromEntries(SEVERITIES.map((severity) => [severity, 0]));
 
   const issues = result.issues.map((issue) => {
-    const fingerprints = issueFingerprints(issue);
-    fingerprints.forEach((fp) => seen.add(fp));
+    // A baseline written by an older version holds the legacy fingerprints: accept both.
+    const isKnown = issueNodes(issue).map((node) => {
+      const current = nodeFingerprint(issue, node);
+      const legacy = legacyNodeFingerprint(issue, node);
+      seen.add(current);
+      seen.add(legacy);
+      return known.has(current) || known.has(legacy);
+    });
     const nodes = (issue.nodes ?? []).map((node, index) => ({
       ...node,
-      isNew: !known.has(fingerprints[index])
+      isNew: !isKnown[index]
     }));
-    const isNew = fingerprints.some((fp) => !known.has(fp));
+    const isNew = isKnown.some((knownNode) => !knownNode);
     if (isNew) newIssuesBySeverity[issue.severity] += 1;
     return { ...issue, nodes, isNew };
   });
